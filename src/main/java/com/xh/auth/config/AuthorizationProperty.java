@@ -3,7 +3,7 @@ package com.xh.auth.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "auth-autonomy")
+@ConfigurationProperties(prefix = "lui-auth")
 public class AuthorizationProperty {
 	
 	/**
