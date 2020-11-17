@@ -3,28 +3,26 @@
 一个依赖于spring boot简单的权限验证工具，无需下载工程，无复杂配置，只需依赖jar并简单配置即可使用。
 
 特点如下：
-  1、配置简单
-  2、可动态授权
-  3、支持同一账号只能一人登陆
-  4、使用注解标记权限，减少代码入侵
-  5、使用redis存储权限信息
+  1、配置简单	<br/>
+  2、可动态授权	<br/>
+  3、支持同一账号只能一人登陆	<br/>
+  4、使用注解标记权限，减少代码入侵	<br/>
+  5、使用redis存储权限信息	<br/>
   
 # 开始使用
 
-#### 添加依赖
+## 添加依赖
 ```xml
-		<dependency>
-            <groupId>com.xh.auth</groupId>
-            <artifactId>lui-auth</artifactId>
-            <version>0.0.1-RELEASE</version>
-        </dependency>
-		
-		
+<dependency>
+	<groupId>com.xh.auth</groupId>
+	<artifactId>lui-auth</artifactId>
+	<version>0.0.1-RELEASE</version>
+</dependency>
 
 ```
 **maven中央库上传中...**
 
-#### 启动类添加注解开关
+## 启动类添加注解开关
 在你的项目启动类添加@EnableAuthentication注解开关
 ```java
 @SpringBootApplication
@@ -37,7 +35,7 @@ public class Application {
 }
 ```
 
-#### 配置redis连接信息和token加密密钥
+## 配置redis连接信息和token加密密钥
 
 ```yml
 spring:
@@ -57,7 +55,7 @@ lui-auth:
 
 
 
-#### 配置拦截器
+## 配置拦截器
 
 ```java
 @EnableWebMvc
@@ -75,7 +73,7 @@ public class WebMvcConfig  implements WebMvcConfigurer {
     }
 ```
 
-#### 给需要鉴权的接口添加注解标记
+## 给需要鉴权的接口添加注解标记
 
 以controller为例：
 
@@ -98,7 +96,7 @@ public class ExampController {
 权限码可自定义 : `@Permission(name = "测试接口",value = OptionType.CUSTOM,customPermissionCode = "MYCUSTOM")`
 
 
-#### 最后一步，生成token
+## 最后一步，生成token
 
 在登陆接口验证完账号密码后调用以下接口生成token返回到前端：
 
@@ -152,24 +150,24 @@ public class LoginController {
 
 用户->角色、角色->权限的关系表自行维护，此工具仅仅用来授权和鉴权，具体思路是，给角色绑定权限码，为用户添加角色时将该角色的权限码授予该用户（暂时还不支持角色修改后其关联用户的权限码一并修改）
 
-#### 其它说明
+# 其它说明
 
 `authorizeManager.getPermissionMenu()` 可获取在注解上配置的名称和权限码，结构为二级深度的自包含树形结构
 
 
 初始版本还很渣，后续会渐渐的增加功能并优化，逐渐思考新的鉴权方式
 
-### TODO LIST
+# TODO LIST
 
-1、独立为一个单独的鉴权服务，支持微服务注册中心、对称密钥等调用方式
+1、独立为一个单独的鉴权服务，支持微服务注册中心、对称密钥等调用方式	<br/>
 
-2、IP白黑名称
+2、IP白黑名称	<br/>
 
-3、用户限流
+3、用户限流	<br/>
 
-4、支持mysql存储
+4、支持mysql存储	<br/>
 
-5、优化权限菜单结构
+5、优化权限菜单结构	<br/>
 
 
 
