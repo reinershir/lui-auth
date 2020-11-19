@@ -14,7 +14,7 @@
 ## 添加依赖
 ```xml
 <dependency>
-	<groupId>com.xh.auth</groupId>
+	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
 	<version>0.0.1-RELEASE</version>
 </dependency>
