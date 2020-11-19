@@ -2,7 +2,7 @@
 
 一个依赖于spring boot简单的权限验证工具，无需下载工程，无复杂配置，只需依赖jar并简单配置即可使用。
 
-特点如下：
+特点如下：<br/>
   1、配置简单	<br/>
   2、可动态授权	<br/>
   3、支持同一账号只能一人登陆	<br/>
@@ -30,7 +30,7 @@
 public class Application {
 	
 	public static void main(String[] args) {
-		Application.run(MonitorApplication.class, args);
+		Application.run(Application.class, args);
 	}
 }
 ```

@@ -46,4 +46,13 @@ public @interface PermissionMapping {
 	 * @return
 	 */
 	String name() default "";
+	
+	/**
+	 * @Title: orderIndex
+	 * @Description:  用于排序ASC
+	 * @author xh
+	 * @date 2020年11月19日
+	 * @return
+	 */
+	int orderIndex() default 0;
 }

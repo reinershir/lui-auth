@@ -1,7 +1,7 @@
 package io.github.reinershir.auth.core.support;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -324,8 +324,8 @@ public class AuthorizeManager {
 	 * @date 2020年11月13日
 	 * @return
 	 */
-	public Map<String,Menu> getPermissionMenu(){
-		return scanner.getMenMap();
+	public List<Menu> getPermissionMenu(){
+		return scanner.getMenus();
 	}
 	
 	private boolean isNotEmpty(String ...param) {

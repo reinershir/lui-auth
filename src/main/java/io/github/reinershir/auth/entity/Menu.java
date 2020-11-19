@@ -9,13 +9,16 @@ public class Menu {
 	
 	private String permissionCode;
 	
-	private List<Menu> children = new LinkedList<>();
+	private Integer orderIndex;
+	
+	private List<Menu> children;
 	
 	
-	public Menu(String name, String permissionCode) {
+	public Menu(String name, String permissionCode,Integer orderIndex) {
 		super();
 		this.name = name;
 		this.permissionCode = permissionCode;
+		this.orderIndex=orderIndex;
 	}
 
 	public String getName() {
@@ -42,7 +45,20 @@ public class Menu {
 		this.children = children;
 	}
 
-	
+	public Integer getOrderIndex() {
+		return orderIndex;
+	}
+
+	public void setOrderIndex(Integer orderIndex) {
+		this.orderIndex = orderIndex;
+	}
+
+	public void addChild(Menu menu) {
+		if(children==null) {
+			children = new LinkedList<>();
+		}
+		children.add(menu);
+	}
 	
 	
 }

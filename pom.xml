@@ -19,7 +19,7 @@
     
     <scm>
         <tag>master</tag>
-        <url>git@github.com:wc394915432/lui-auth.git</url>
+        <url>git@github.com:reinershir/lui-auth.git</url>
         <connection>scm:git:git@github.com:reinershir/lui-auth.git</connection>
         <developerConnection>scm:git:git@github.com:reinershir/lui-auth.git</developerConnection>
     </scm>
