@@ -138,11 +138,11 @@ public class LoginController {
 
 `intergrateConfig.enable=true` 开启时会自动生成3张表，分别为角色表、菜单表、角色权限表，3张表提供增删改查接口
 
-#角色、菜单集成功能使用示例
+# 角色、菜单集成功能使用示例
 
-###角色表增删改查接口示例
+### 角色表增删改查接口示例
 
-```
+```java
 @RequestMapping("role")
 @RestController
 @Api(value = "角色模块接口",tags = "角色管理")
@@ -207,9 +207,9 @@ public class RoleController {
 
 ```
 
-###菜单表接口使用示例
+### 菜单表接口使用示例
 
-```
+```java
 @RequestMapping("Menu")
 @RestController
 @Api(value = "菜单模块接口",tags = "菜单管理")
@@ -265,9 +265,9 @@ public class MenuController {
 
 ```
 
-###为用户绑定角色示例
+### 为用户绑定角色示例
 
-```
+```java
 @Autowired
 AuthorizeManager authorizeManager;
 
