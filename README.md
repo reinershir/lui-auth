@@ -1,13 +1,15 @@
 # lui-auth
 
-一个依赖于spring boot简单的权限验证工具，无需下载工程，无复杂配置，只需依赖jar并简单配置即可使用。
+一个依赖于spring boot简单的权限验证工具，集成角色、菜单、权限功能，无需下载工程，无复杂配置，只需依赖jar并简单配置即可使用。
 
 特点如下：<br/>
   1、配置简单	<br/>
-  2、可动态授权	<br/>
+  2、集成了菜单、角色、权限管理	<br/>
   3、支持同一账号只能一人登陆	<br/>
   4、使用注解标记权限，减少代码入侵	<br/>
   5、使用redis存储权限信息	<br/>
+  6、菜单管理支持无限层级树形结构，使用左右值树形结构存储，查询效率非常快
+  
   
 # 开始使用
 
@@ -16,11 +18,10 @@
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>0.0.1-RELEASE</version>
+	<version>0.0.2-RELEASE</version>
 </dependency>
 
 ```
-**maven中央库上传中...**
 
 ## 启动类添加注解开关
 在你的项目启动类添加@EnableAuthentication注解开关
@@ -48,9 +49,12 @@ spring:
     timeout: 3000
 	
 lui-auth:
-  tokenSalt: 1233211234567 #密钥可自由配置
-  tokenHeaderName: Access-Token   #前端传token时的头名称，可修改
-  tokenExpireTime: 1800   #token失效时间，默认30分钟,单位为秒
+  authrizationConfig: 
+    administratorId: 1  #超级管理员用户ID，防止角色被全删无法登陆的情况，该用户ID一登陆即拥有所有权限
+    tokenSalt: yorTokenSalt   #生成token的盐
+	tokenExpireTime: 1800   #token失效时间，默认30分钟,单位为秒
+  intergrateConfig: 
+    enable: true   #使用集成的角色、菜单管理功能，将会自动生成三张表，提供增删改查接口
 ```
 
 
@@ -114,37 +118,14 @@ public class LoginController {
 		//登陆验证完成后
 		String userId = "你的用户ID唯一标识";
 		Sint userType = 1; //用户类型标记
-		String token = authorizeManager.generateToken(userId, userType);
+		String token = authorizeManager.generateToken(userId, userType); //如果ID= 配置的administratorId，会拥有所有权限
 		return token;
 	}
 }
 ```
 
-此时的用户是没有权限的，需要给用户授权，如下例子，给ID为“1”的用户授予所有权限：
 
-```java
 
-@RestController
-@RequestMapping("user")
-public class LoginController {
-
-	@Autowired
-	AuthorizeManager authorizeManager;
-	
-	@PostMapping("login")
-	public Object login(@RequestBody LoginInfoDTO loginInfo) {
-		//登陆验证完成后
-		String userId = "1";
-		Sint userType = 1; //用户类型标记
-		String token = authorizeManager.generateToken(userId, userType);
-		//给ID为1的用户添加所有权限，即“超级管理员”
-		authorizeManager.grantTemporaryPermission("1", authorizeManager.getAllPermissionCodes());
-		//也可以添加有时效的临时授权
-		authorizeManager.grantTemporaryPermission("1", authorizeManager.getAllPermissionCodes(),1800l);
-		return token;
-	}
-}
-```
 
 前端传token时需要在http header里添加：  Access-Token: 登陆接口返回的token  ,header name是可配置的，默认Access-Token
 
@@ -152,8 +133,151 @@ public class LoginController {
 
 # 其它说明
 
-`authorizeManager.getPermissionMenu()` 可获取在注解上配置的名称和权限码，结构为二级深度的自包含树形结构
+`intergrateConfig.enable=true` 开启时会自动生成3张表，分别为角色表、菜单表、角色权限表，3张表提供增删改查接口
 
+#角色、菜单集成功能使用示例
+
+###角色表增删改查接口示例
+
+```
+@RequestMapping("role")
+@RestController
+@Api(value = "角色模块接口",tags = "角色管理")
+@PermissionMapping(value="ROLE")
+public class RoleController {
+	
+	
+	RoleAccess roleAccess;
+	@Autowired
+	public RoleController(AuthorizeManager authorizeManager) {
+		this.roleAccess=authorizeManager.getRoleAccess();
+	}
+
+	@Permission(name = "角色列表",value = OptionType.LIST)
+	@ApiOperation(value = "角色列表查询接口",notes = "角色列表",httpMethod = "GET")
+	@GetMapping("list")
+	public ResultDTO<PageBean<Role>> list(@Validated PageReqDTO reqDTO){
+		List<io.github.reinershir.auth.core.model.Role> list = roleAccess.selectList(reqDTO.getPage(), reqDTO.getPageSize());
+		Long count = roleAccess.selectCount(null);
+		return ResponseUtil.generateSuccessDTO(new PageBean<>(reqDTO.getPage(),reqDTO.getPageSize(),count,list));
+	}
+	
+	@Permission(name = "添加角色",value = OptionType.ADD)
+	@ApiOperation(value = "添加角色",notes = "添加角色",httpMethod = "POST")
+	@PostMapping
+	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO dto){
+		if(roleAccess.insert(dto,dto.getMenuIds())>0) {
+			return ResponseUtil.generateSuccessDTO();
+		}
+		return ResponseUtil.generateFaileDTO("添加失败！");
+	}
+	
+	@Permission(name = "修改角色信息",value = OptionType.UPDATE)
+	@ApiOperation(value = "修改角色信息",notes = "修改角色",httpMethod = "PATCH")
+	@PatchMapping
+	public ResultDTO<Object> updateUser(@Validated(value = ValidateGroups.UpdateGroup.class) @RequestBody RoleDTO roleDTO){
+		if(roleAccess.updateById(roleDTO, roleDTO.getMenuIds())>0) {
+			return ResponseUtil.generateSuccessDTO();
+		}
+		return ResponseUtil.generateFaileDTO("修改失败！");
+	}
+	
+	@Permission(name = "删除角色",value = OptionType.DELETE)
+	@ApiImplicitParam(name = "id",value = "角色ID",required = true,dataType = "String",paramType = "path")
+	@ApiOperation(value = "删除角色",notes = "逻辑删除角色",httpMethod = "DELETE")
+	@DeleteMapping("/{id}")
+	public ResultDTO<Object> delete(@PathVariable("id") Long id){
+		if(roleAccess.deleteById(id)>0) {
+			return ResponseUtil.generateSuccessDTO("删除成功！");
+		}
+		return ResponseUtil.generateFaileDTO("修改失败！");
+	}
+	
+	@Permission(name = "查询角色所绑定的菜单权限",value = OptionType.CUSTOM,customPermissionCode = "ROLE_PERMISSION")
+	@ApiImplicitParam(name = "roleId",value = "角色ID",required = true,dataType = "String",paramType = "path")
+	@ApiOperation(value = "查询角色所绑定的菜单权限",notes = "查询角色所绑定的菜单权限",httpMethod = "GET")
+	@GetMapping("/{roleId}/rolePermissions")
+	public ResultDTO<List<RolePermission>> getRolePermissionsById(@PathVariable("roleId") Long roleId){
+		return ResponseUtil.generateSuccessDTO(roleAccess.selectRolePermissionByRole(roleId));
+	}
+}
+
+```
+
+###菜单表接口使用示例
+
+```
+@RequestMapping("Menu")
+@RestController
+@Api(value = "菜单模块接口",tags = "菜单管理")
+@PermissionMapping(value="MENU")
+public class MenuController {
+	
+	
+	MenuAccess MenuAccess;
+	@Autowired
+	public MenuController(AuthorizeManager authorizeManager) {
+		this.MenuAccess=authorizeManager.getMenuAccess();
+	}
+
+	@Permission(name = "菜单列表",value = OptionType.LIST)
+	@ApiOperation(value = "菜单列表查询接口",notes = "菜单列表",httpMethod = "GET")
+	@GetMapping("list")
+	public ResultDTO<List<Menu>> list(@RequestParam(value="parentId",required = false) Long parentId){
+		return ResponseUtil.generateSuccessDTO(MenuAccess.qureyList(parentId));
+	}
+	
+	@Permission(name = "添加菜单",value = OptionType.ADD)
+	@ApiOperation(value = "添加菜单",notes = "添加菜单",httpMethod = "POST")
+	@ApiImplicitParam(name = "parentId",value = "父级菜单ID",required = false,dataType = "Long",paramType = "path")
+	@PostMapping
+	public ResultDTO<Object> addMenu(@Validated @RequestBody MenuVO menu,@RequestParam(value="parentId",required = false) Long parentId){
+		if(MenuAccess.insertMenu(menu,parentId)>0) {
+			return ResponseUtil.generateSuccessDTO();
+		}
+		return ResponseUtil.generateFaileDTO("添加失败！");
+	}
+	
+	@Permission(name = "修改菜单信息",value = OptionType.UPDATE)
+	@ApiOperation(value = "修改菜单信息",notes = "修改菜单",httpMethod = "PATCH")
+	@PatchMapping
+	public ResultDTO<Object> updateMenu( @RequestBody MenuVO MenuDTO){
+		if(MenuAccess.updateById(MenuDTO)>0) {
+			return ResponseUtil.generateSuccessDTO();
+		}
+		return ResponseUtil.generateFaileDTO("修改失败！");
+	}
+	
+	@Permission(name = "删除菜单",value = OptionType.DELETE)
+	@ApiImplicitParam(name = "id",value = "菜单ID",required = true,dataType = "String",paramType = "path")
+	@ApiOperation(value = "删除菜单",notes = "逻辑删除菜单",httpMethod = "DELETE")
+	@DeleteMapping("/{id}")
+	public ResultDTO<Object> delete(@PathVariable("id") Long id){
+		if(MenuAccess.deleteById(id)>0) {
+			return ResponseUtil.generateSuccessDTO("删除成功！");
+		}
+		return ResponseUtil.generateFaileDTO("修改失败！");
+	}
+}
+
+```
+
+###为用户绑定角色示例
+
+```
+@Autowired
+AuthorizeManager authorizeManager;
+
+...
+//为用户绑定角色
+if(!CollectionUtils.isEmpty(roleIds)) {
+	authorizeManager.getRoleAccess().bindRoleForUser(userId, roleIds);
+}
+
+
+//获取用户绑定的角色：
+authorizeManager.getRoleAccess().getRoleByUser(userId);
+```
 
 初始版本还很渣，后续会渐渐的增加功能并优化，逐渐思考新的鉴权方式
 
@@ -165,10 +289,11 @@ public class LoginController {
 
 3、用户限流	<br/>
 
-4、支持mysql存储	<br/>
+4、优化权限菜单结构	<br/>
 
-5、优化权限菜单结构	<br/>
+5、支持redisson
 
+6、集成的增删改暂时只支持oracle和mysql
 
 
 
