@@ -21,6 +21,11 @@
 	<version>0.0.2-RELEASE</version>
 </dependency>
 
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+
 ```
 
 ## 启动类添加注解开关
