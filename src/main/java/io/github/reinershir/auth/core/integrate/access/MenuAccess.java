@@ -48,7 +48,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 			list =  jdbcTemplate.query("SELECT * FROM "+tableName+" ORDER BY LEFT_VALUE ASC", mapper);
 		}else {
 			Menu parent = selectById(parentId);
-			list = jdbcTemplate.query("SELECT * FROM "+tableName+" WHERE LEFT_VALUE>? AND RIGHT_VALUE > ? ORDER BY LEFT_VALUE", mapper,parent.getLeftValue(),parent.getRightValue());
+			list = jdbcTemplate.query("SELECT * FROM "+tableName+" WHERE LEFT_VALUE>? AND RIGHT_VALUE < ? ORDER BY LEFT_VALUE", mapper,parent.getLeftValue(),parent.getRightValue());
 		}
 		return convertToTree(list);
 	}
@@ -64,9 +64,9 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	private List<Menu> convertToTree(List<Menu> list ){
 		List<Menu> resultList = new LinkedList<>();
 		//记录上一个元素的菜单层级
-		Integer beforeLevel = 1;
+		Integer beforeLevel = -999;
 		for (Menu menu : list) {
-			if(beforeLevel==menu.getLevel()-1) {
+			if(beforeLevel==menu.getLevel()-1||beforeLevel==menu.getLevel()) {
 				//根据层级关系装配菜单数据
 				assemblingChildMenu(resultList,menu);
 			}else {
