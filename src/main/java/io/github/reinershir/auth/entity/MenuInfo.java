@@ -3,21 +3,29 @@ package io.github.reinershir.auth.entity;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Menu {
+public class MenuInfo {
 
 	private String name;
 	
-	private String permissionCode;
+	private String[] permissionCode;
 	
 	private Integer orderIndex;
 	
-	private List<Menu> children;
+	private List<MenuInfo> children;
 	
 	
-	public Menu(String name, String permissionCode,Integer orderIndex) {
+	public MenuInfo(String name, String[] permissionCode,Integer orderIndex) {
 		super();
 		this.name = name;
 		this.permissionCode = permissionCode;
+		this.orderIndex=orderIndex;
+	}
+	
+	public MenuInfo(String name, String permissionCode,Integer orderIndex) {
+		super();
+		this.name = name;
+		this.permissionCode = new String[1];
+		this.permissionCode[0] = permissionCode;
 		this.orderIndex=orderIndex;
 	}
 
@@ -29,19 +37,19 @@ public class Menu {
 		this.name = name;
 	}
 
-	public String getPermissionCode() {
+	public String[] getPermissionCode() {
 		return permissionCode;
 	}
 
-	public void setPermissionCode(String permissionCode) {
+	public void setPermissionCode(String[] permissionCode) {
 		this.permissionCode = permissionCode;
 	}
 
-	public List<Menu> getChildren() {
+	public List<MenuInfo> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<Menu> children) {
+	public void setChildren(List<MenuInfo> children) {
 		this.children = children;
 	}
 
@@ -53,7 +61,7 @@ public class Menu {
 		this.orderIndex = orderIndex;
 	}
 
-	public void addChild(Menu menu) {
+	public void addChild(MenuInfo menu) {
 		if(children==null) {
 			children = new LinkedList<>();
 		}

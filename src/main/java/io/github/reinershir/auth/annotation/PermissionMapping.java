@@ -20,39 +20,4 @@ public @interface PermissionMapping {
 	 */
 	String value();
 	
-	/**
-	 * @Title: isParentNode
-	 * @Description:   是否是父节点（用于生成树结构菜单时标记用）
-	 * @author xh
-	 * @date 2020年11月12日
-	 * @return
-	 */
-	boolean isParentNode() default false;
-	
-	/**
-	 * @Title: parentPermissionCode
-	 * @Description:   父节点的权限码
-	 * @author xh
-	 * @date 2020年11月12日
-	 * @return
-	 */
-	String parentPermissionCode() default "";
-	
-	/**
-	 * @Title: name
-	 * @Description:   菜单名称(此名称需要保持唯一)
-	 * @author xh
-	 * @date 2020年11月12日
-	 * @return
-	 */
-	String name() default "";
-	
-	/**
-	 * @Title: orderIndex
-	 * @Description:  用于排序ASC
-	 * @author xh
-	 * @date 2020年11月19日
-	 * @return
-	 */
-	int orderIndex() default 0;
 }

@@ -4,33 +4,51 @@
   <artifactId>lui-auth</artifactId>
   <version>0.0.1-RELEASE</version>
   <description>simple authentication frame work</description>
+  <name>lui-auth</name>
+  <url>https://github.com/reinershir/lui-auth</url>
   <packaging>jar</packaging>
   
   <properties>
         <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
+        <argLine>-Dfile.encoding=UTF-8</argLine>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
     </properties>
     
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
     
-    <scm>
-        <tag>master</tag>
-        <url>git@github.com:reinershir/lui-auth.git</url>
-        <connection>scm:git:git@github.com:reinershir/lui-auth.git</connection>
-        <developerConnection>scm:git:git@github.com:reinershir/lui-auth.git</developerConnection>
-    </scm>
+   <scm> 
+      <connection>
+         scm:git:https://github.com/reinershir/lui-auth.git
+      </connection>
+      <developerConnection>
+         scm:git:https://github.com/reinershir/lui-auth.git
+      </developerConnection>
+      <url>https://github.com/reinershir/lui-auth</url>
+     <tag>0.0.1</tag>
+  </scm>
     
     <developers>
     <developer>
-      <id>xh-auth</id>
       <name>xh</name>
       <email>1929696771@qq.com</email>
+      <organization>person</organization>
+      <organizationUrl>https://github.com/reinershir</organizationUrl>
     </developer>
   </developers>
+  
+  <distributionManagement>
+  <repository>
+    <id>release</id>
+    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+  </repository>
+  <snapshotRepository>
+  	<!-- 这里要对应settings.xml server的ID -->
+    <id>snapshots</id>
+    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+  </snapshotRepository>
+  
+</distributionManagement>
+
     
  <dependencyManagement>
         <dependencies>
@@ -62,6 +80,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
   
   	<dependency>
             <groupId>org.springframework.boot</groupId>
@@ -84,23 +107,75 @@
   
   <build>
         <plugins>
-            <plugin>
+        
+         <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
             </plugin>
+        <!-- 源码打包插件 -->
+       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- java doc生成插件 -->
+	<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration> 
+            	<!-- 跳过javadoc的严格检查 -->
+            	<additionalOptions>-Xdoclint:none</additionalOptions>
+			</configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- 自动签名插件 -->
+      <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-gpg-plugin</artifactId>
+      <version>1.5</version>
+      <executions>
+        <execution>
+          <id>sign-artifacts</id>
+          <phase>verify</phase>
+          <goals>
+            <goal>sign</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+      
         </plugins>
   </build>
   
-  <licenses>
-     <license>
-       <name>The Apache License, Version 2.0</name>
-       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-     </license>
-   </licenses>
+<licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  
   
 </project>

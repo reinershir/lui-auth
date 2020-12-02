@@ -8,6 +8,8 @@ public class AuthContract {
 	
 	public static final String TEMPORARY_PERMISSION_KEY="-temporary-permission-key";
 	
+	public static final String USER_ROLE_BIND_KEY="LUI-AUTH-BIND-ROLE-KEY-";
+	
 	public static final int AUTHORIZATION_STATUS_SUCCESS=0;
 	
 	public static final int AUTHORIZATION_STATUS_NO_TOKEN=1;

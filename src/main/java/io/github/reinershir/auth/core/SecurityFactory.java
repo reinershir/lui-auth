@@ -8,7 +8,6 @@ import org.springframework.web.method.HandlerMethod;
 import io.github.reinershir.auth.annotation.Permission;
 import io.github.reinershir.auth.annotation.PermissionMapping;
 import io.github.reinershir.auth.config.AuthorizationProperty;
-import io.github.reinershir.auth.config.CustomManager;
 import io.github.reinershir.auth.contract.AuthContract;
 import io.github.reinershir.auth.core.guard.DefaultFeedbacker;
 import io.github.reinershir.auth.core.guard.InsideSecurity;
@@ -40,11 +39,11 @@ public class SecurityFactory {
         String serviceToken = httpServletRequest.getHeader(AuthContract.SERVICE_SECRET_HEADER);
         if(manager!=null&&manager.getSecurityGuard()!=null) {
         	return manager.getSecurityGuard();
-        }else if(property.getServiceCommunication()&&!StringUtils.isEmpty(serviceToken)) { 
-        	return new InsideSecurity(property.getServiceSecret());
+        }else if(property.getAuthrizationConfig().getServiceCommunication()&&!StringUtils.isEmpty(serviceToken)) { 
+        	return new InsideSecurity(property.getAuthrizationConfig().getServiceSecret());
         }else if(mapping!=null&&!StringUtils.isEmpty(mapping.value())) {
         	if(CheckValueUtil.checkPermissionCode(methodPermission)||CheckValueUtil.checkPermissionCode(classPermission)) {
-        		return new UserSecurity(authorizeManager,property.getTokenHeaderName());
+        		return new UserSecurity(authorizeManager,property.getAuthrizationConfig().getTokenHeaderName());
         	}
         }
 		return null;

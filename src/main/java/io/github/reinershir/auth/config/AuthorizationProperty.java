@@ -1,106 +1,58 @@
 package io.github.reinershir.auth.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import io.github.reinershir.auth.config.property.AuthrizationConfig;
+import io.github.reinershir.auth.config.property.IntegrateConfig;
+import io.github.reinershir.auth.core.integrate.GenerateTable;
+import io.github.reinershir.auth.core.integrate.generator.MenuGenerator;
+import io.github.reinershir.auth.core.integrate.generator.RoleGenerator;
 
 @ConfigurationProperties(prefix = "lui-auth")
-public class AuthorizationProperty {
+public class AuthorizationProperty implements InitializingBean{
+	JdbcTemplate jdbcTemplate;
+	public AuthorizationProperty(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate=jdbcTemplate;
+	}
 	
-	/**
-	 * 服务内部通信密钥
-	 */
-	private String serviceSecret;
+	@NestedConfigurationProperty
+	private AuthrizationConfig authrizationConfig;
 	
-	/**
-	 * token加密的盐
-	 */
-	private String tokenSalt;
+	@NestedConfigurationProperty
+	private IntegrateConfig intergrateConfig;
 	
-	/**
-	 * 是否开启服务内部通信密钥认证
-	 */
-	private Boolean serviceCommunication=false;
 	
-	/**
-	 * 用户认证数据缓存数量
-	 */
-	private Integer cacheSize = 500;
-	
-	/**
-	 * token失效时间(单为秒)
-	 */
-	private Long tokenExpireTime=30l*60l;
-	
-	/**
-	 * token在header中的名称
-	 */
-	private String tokenHeaderName="Access-Token";
-	
-	@Value("spring.application.name")
-	private String applicationName;
-	
-	public String getServiceSecret() {
-		if(serviceSecret==null) {
-			return applicationName+"DefaultServiceSalt";
+	public AuthrizationConfig getAuthrizationConfig() {
+		return authrizationConfig;
+	}
+
+	public void setAuthrizationConfig(AuthrizationConfig authrizationConfig) {
+		this.authrizationConfig = authrizationConfig;
+	}
+
+	public IntegrateConfig getIntergrateConfig() {
+		return intergrateConfig;
+	}
+
+	public void setIntergrateConfig(IntegrateConfig intergrateConfig) {
+		this.intergrateConfig = intergrateConfig;
+	}
+
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if(intergrateConfig!=null) {
+			if(intergrateConfig.getEnable()) {
+				GenerateTable roleGenerate = new RoleGenerator(jdbcTemplate);
+				roleGenerate.generate(intergrateConfig.getRoleTableName());
+				GenerateTable menuGenerate = new MenuGenerator(jdbcTemplate);
+				menuGenerate.generate(intergrateConfig.getMenuTableName());
+				
+			}
 		}
-		return serviceSecret;
+		
 	}
-
-	public void setServiceSecret(String serviceSecret) {
-		this.serviceSecret = serviceSecret;
-	}
-
-	public Boolean getServiceCommunication() {
-		return serviceCommunication;
-	}
-
-	public void setServiceCommunication(Boolean serviceCommunication) {
-		this.serviceCommunication = serviceCommunication;
-	}
-
-	public Integer getCacheSize() {
-		return cacheSize;
-	}
-
-	public void setCacheSize(Integer cacheSize) {
-		this.cacheSize = cacheSize;
-	}
-
-	public String getApplicationName() {
-		return applicationName;
-	}
-
-	public void setApplicationName(String applicationName) {
-		this.applicationName = applicationName;
-	}
-
-	public Long getTokenExpireTime() {
-		return tokenExpireTime;
-	}
-
-	public void setTokenExpireTime(Long tokenExpireTime) {
-		this.tokenExpireTime = tokenExpireTime;
-	}
-
-	public String getTokenSalt() {
-		if(tokenSalt==null) {
-			return applicationName+"DefaultSalt";
-		}
-		return tokenSalt;
-	}
-
-	public void setTokenSalt(String tokenSalt) {
-		this.tokenSalt = tokenSalt;
-	}
-
-	public String getTokenHeaderName() {
-		return tokenHeaderName;
-	}
-
-	public void setTokenHeaderName(String tokenHeaderName) {
-		this.tokenHeaderName = tokenHeaderName;
-	}
-
-
-	
 }

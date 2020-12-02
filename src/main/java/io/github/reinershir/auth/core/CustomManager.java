@@ -1,7 +1,4 @@
-package io.github.reinershir.auth.config;
-
-import io.github.reinershir.auth.core.Feedbacker;
-import io.github.reinershir.auth.core.SecurityGuard;
+package io.github.reinershir.auth.core;
 
 public class CustomManager {
 	

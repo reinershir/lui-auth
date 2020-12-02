@@ -10,8 +10,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import io.github.reinershir.auth.config.AuthorizationProperty;
-import io.github.reinershir.auth.config.CustomManager;
 import io.github.reinershir.auth.contract.AuthContract;
+import io.github.reinershir.auth.core.CustomManager;
 import io.github.reinershir.auth.core.SecurityFactory;
 import io.github.reinershir.auth.core.SecurityGuard;
 import io.github.reinershir.auth.core.support.AuthorizeManager;
