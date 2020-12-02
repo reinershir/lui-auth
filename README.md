@@ -8,7 +8,7 @@
   3、支持同一账号只能一人登陆	<br/>
   4、使用注解标记权限，减少代码入侵	<br/>
   5、使用redis存储权限信息	<br/>
-  6、菜单管理支持无限层级树形结构，使用左右值树形结构存储，查询效率非常快
+  6、菜单管理支持无限层级树形结构，使用左右值树形结构(modified preorder tree traversal)存储，查询效率非常快
   
   
 # 开始使用
@@ -61,11 +61,12 @@ lui-auth:
 
 ## 配置拦截器
 
+以下为spring boot配置方式：
 ```java
 @EnableWebMvc
 public class WebMvcConfig  implements WebMvcConfigurer {
 
-	@Autowired
+	@Autowired(required=false)
 	AuthenticationInterceptor authenticationInterceptor;
 	
 	/**
@@ -73,7 +74,9 @@ public class WebMvcConfig  implements WebMvcConfigurer {
 	 */
 	@Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authenticationInterceptor);
+		if(authenticationInterceptor!=null){
+			registry.addInterceptor(authenticationInterceptor);
+		}
     }
 ```
 
@@ -129,7 +132,7 @@ public class LoginController {
 
 前端传token时需要在http header里添加：  Access-Token: 登陆接口返回的token  ,header name是可配置的，默认Access-Token
 
-用户->角色、角色->权限的关系表自行维护，此工具仅仅用来授权和鉴权，具体思路是，给角色绑定权限码，为用户添加角色时将该角色的权限码授予该用户（暂时还不支持角色修改后其关联用户的权限码一并修改）
+
 
 # 其它说明
 
