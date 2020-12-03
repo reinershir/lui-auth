@@ -150,7 +150,6 @@ public class LoginController {
 ```java
 @RequestMapping("role")
 @RestController
-@Api(value = "角色模块接口",tags = "角色管理")
 @PermissionMapping(value="ROLE")
 public class RoleController {
 	
@@ -162,7 +161,6 @@ public class RoleController {
 	}
 
 	@Permission(name = "角色列表",value = OptionType.LIST)
-	@ApiOperation(value = "角色列表查询接口",notes = "角色列表",httpMethod = "GET")
 	@GetMapping("list")
 	public ResultDTO<PageBean<Role>> list(@Validated PageReqDTO reqDTO){
 		List<io.github.reinershir.auth.core.model.Role> list = roleAccess.selectList(reqDTO.getPage(), reqDTO.getPageSize());
@@ -171,7 +169,6 @@ public class RoleController {
 	}
 	
 	@Permission(name = "添加角色",value = OptionType.ADD)
-	@ApiOperation(value = "添加角色",notes = "添加角色",httpMethod = "POST")
 	@PostMapping
 	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO dto){
 		if(roleAccess.insert(dto,dto.getMenuIds())>0) {
@@ -181,7 +178,6 @@ public class RoleController {
 	}
 	
 	@Permission(name = "修改角色信息",value = OptionType.UPDATE)
-	@ApiOperation(value = "修改角色信息",notes = "修改角色",httpMethod = "PATCH")
 	@PatchMapping
 	public ResultDTO<Object> updateUser(@Validated(value = ValidateGroups.UpdateGroup.class) @RequestBody RoleDTO roleDTO){
 		if(roleAccess.updateById(roleDTO, roleDTO.getMenuIds())>0) {
@@ -191,8 +187,6 @@ public class RoleController {
 	}
 	
 	@Permission(name = "删除角色",value = OptionType.DELETE)
-	@ApiImplicitParam(name = "id",value = "角色ID",required = true,dataType = "String",paramType = "path")
-	@ApiOperation(value = "删除角色",notes = "逻辑删除角色",httpMethod = "DELETE")
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
 		if(roleAccess.deleteById(id)>0) {
@@ -202,8 +196,6 @@ public class RoleController {
 	}
 	
 	@Permission(name = "查询角色所绑定的菜单权限",value = OptionType.CUSTOM,customPermissionCode = "ROLE_PERMISSION")
-	@ApiImplicitParam(name = "roleId",value = "角色ID",required = true,dataType = "String",paramType = "path")
-	@ApiOperation(value = "查询角色所绑定的菜单权限",notes = "查询角色所绑定的菜单权限",httpMethod = "GET")
 	@GetMapping("/{roleId}/rolePermissions")
 	public ResultDTO<List<RolePermission>> getRolePermissionsById(@PathVariable("roleId") Long roleId){
 		return ResponseUtil.generateSuccessDTO(roleAccess.selectRolePermissionByRole(roleId));
@@ -217,7 +209,6 @@ public class RoleController {
 ```java
 @RequestMapping("Menu")
 @RestController
-@Api(value = "菜单模块接口",tags = "菜单管理")
 @PermissionMapping(value="MENU")
 public class MenuController {
 	
@@ -229,15 +220,12 @@ public class MenuController {
 	}
 
 	@Permission(name = "菜单列表",value = OptionType.LIST)
-	@ApiOperation(value = "菜单列表查询接口",notes = "菜单列表",httpMethod = "GET")
 	@GetMapping("list")
 	public ResultDTO<List<Menu>> list(@RequestParam(value="parentId",required = false) Long parentId){
 		return ResponseUtil.generateSuccessDTO(MenuAccess.qureyList(parentId));
 	}
 	
 	@Permission(name = "添加菜单",value = OptionType.ADD)
-	@ApiOperation(value = "添加菜单",notes = "添加菜单",httpMethod = "POST")
-	@ApiImplicitParam(name = "parentId",value = "父级菜单ID",required = false,dataType = "Long",paramType = "path")
 	@PostMapping
 	public ResultDTO<Object> addMenu(@Validated @RequestBody MenuVO menu,@RequestParam(value="parentId",required = false) Long parentId){
 		if(MenuAccess.insertMenu(menu,parentId)>0) {
@@ -247,7 +235,6 @@ public class MenuController {
 	}
 	
 	@Permission(name = "修改菜单信息",value = OptionType.UPDATE)
-	@ApiOperation(value = "修改菜单信息",notes = "修改菜单",httpMethod = "PATCH")
 	@PatchMapping
 	public ResultDTO<Object> updateMenu( @RequestBody MenuVO MenuDTO){
 		if(MenuAccess.updateById(MenuDTO)>0) {
@@ -257,8 +244,6 @@ public class MenuController {
 	}
 	
 	@Permission(name = "删除菜单",value = OptionType.DELETE)
-	@ApiImplicitParam(name = "id",value = "菜单ID",required = true,dataType = "String",paramType = "path")
-	@ApiOperation(value = "删除菜单",notes = "逻辑删除菜单",httpMethod = "DELETE")
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
 		if(MenuAccess.deleteById(id)>0) {
@@ -297,7 +282,7 @@ authorizeManager.getRoleAccess().getRoleByUser(userId);
 
 3、用户限流	<br/>
 
-4、优化权限菜单结构	<br/>
+4、数据权限（构想中...）	<br/>
 
 5、支持redisson
 
