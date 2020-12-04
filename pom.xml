@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.reinershir.auth</groupId>
   <artifactId>lui-auth</artifactId>
-  <version>0.0.21-RELEASE</version>
+  <version>0.0.22-RELEASE</version>
   <description>simple authentication frame work</description>
   <name>lui-auth</name>
   <url>https://github.com/reinershir/lui-auth</url>
@@ -24,7 +24,7 @@
          scm:git:https://github.com/reinershir/lui-auth.git
       </developerConnection>
       <url>https://github.com/reinershir/lui-auth</url>
-     <tag>0.0.21</tag>
+     <tag>0.0.22</tag>
   </scm>
     
     <developers>
