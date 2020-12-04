@@ -18,7 +18,7 @@
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>0.0.2-RELEASE</version>
+	<version>0.0.21-RELEASE</version>
 </dependency>
 
 <dependency>
@@ -141,7 +141,11 @@ public class LoginController {
 
 # 其它说明
 
-`intergrateConfig.enable=true` 开启时会自动生成3张表，分别为角色表、菜单表、角色权限表，3张表提供增删改查接口
+`intergrateConfig.enable=true` 开启时会自动生成3张表，分别为角色表、菜单表、角色权限表，3张表提供增删改查接口  
+
+*跳过权限验证：*  
+1、控制器上不加注解
+2、使用注解跳过单个接口,示例： `@Permission(OptionType.SKIP)` 
 
 # 角色、菜单集成功能使用示例
 
