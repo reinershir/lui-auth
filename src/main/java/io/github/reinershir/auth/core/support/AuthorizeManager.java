@@ -193,6 +193,22 @@ public class AuthorizeManager {
 		return !StringUtils.isEmpty(tokenInfoJson)?JacksonUtil.readValue(tokenInfoJson, TokenInfo.class):null;
 	}
 	
+	public void logout(HttpServletRequest request) {
+		String token =  request.getHeader(property.getAuthrizationConfig().getTokenHeaderName());
+		if(!StringUtils.isEmpty(token)) {
+			String userInfoToken = token.split("_")[1];
+			if(!StringUtils.isEmpty(userInfoToken)) {
+				redisTemplate.delete(userInfoToken);
+			}
+			TokenInfo tokenInfo = getTokenInfo(request);
+			if(tokenInfo!=null) {
+				this.appointor.removeAllTemporaryPermission(tokenInfo.getUserId());
+			}
+			
+		}
+		
+	}
+	
 	
 	/**
 	 * @Title: getAllPermissionCodes
