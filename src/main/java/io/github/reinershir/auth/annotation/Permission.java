@@ -11,12 +11,11 @@ public @interface Permission {
 	/**
 	 * @date:   2019年5月16日 下午3:50:45   
 	 * @Description: 权限标识代码,声明在类上表示该Controller使用同一权限码验证
-	 * @see 不配置此项该方法权限验证将无效！
 	 * @param: @return      
 	 * @return: String      
 	 * @throws
 	 */
-	OptionType[] value() default OptionType.CUSTOM;
+	OptionType value() default OptionType.CUSTOM;
 	
 	/**
 	 * @date:   2019年5月17日 上午10:55:59   

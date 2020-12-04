@@ -66,18 +66,16 @@ public class PermissionScanner implements CommandLineRunner, ApplicationContextA
                  if (permission == null) {
                      continue;
                  }
-	             OptionType[] optionTypes = permission.value();
-	     		 for(OptionType optionType : optionTypes) {
-	                 String permissionCode = mapping.value()+":"+(optionType==OptionType.CUSTOM?permission.customPermissionCode():optionType.toString());
-	         		if(!StringUtils.isEmpty(permissionCode)) {
+	             OptionType optionType = permission.value();
+                 String permissionCode = mapping.value()+":"+(optionType==OptionType.CUSTOM?permission.customPermissionCode():optionType.toString());
+         		 if(!StringUtils.isEmpty(permissionCode)) {
 //	         			if(parentMenu!=null) {
 //	         				MenuInfo menu = new MenuInfo(permission.name(),permissionCode,mapping.orderIndex());
 //	         				//将子节点加入数组
 //	         				parentMenu.addChild(menu);
 //	         			}
-	         			permissionCodes.add(permissionCode);
-	         		}
-	     		}
+         			permissionCodes.add(permissionCode);
+         		 }
              }
          }
          //System.out.println(JacksonUtil.toJSon(menus));

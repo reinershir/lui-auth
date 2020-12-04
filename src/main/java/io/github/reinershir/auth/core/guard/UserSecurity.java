@@ -38,16 +38,19 @@ public class UserSecurity implements SecurityGuard{
 		Permission hasPermission = CheckValueUtil.checkPermissionCode(methodPermission)?methodPermission:classPermission;
 		//类权限注解和方法权限注解有其一则需要验证权限
 		if(hasPermission!=null) {
-			OptionType[] optionTypes = hasPermission.value();
-			for(OptionType optionType : optionTypes) {
-				if(optionType==OptionType.SKIP) {
-					continue;
-				}
+			OptionType optionType = hasPermission.value();
+			if(optionType==OptionType.SKIP) {
+				return AuthContract.AUTHORIZATION_STATUS_SUCCESS;
+			}
+			//如果只需验证是否登陆
+			if(optionType==OptionType.LOGIN) {
+				return authorizeManager.validateTokenAndRenewal(token);
+			}else {
 				//如果自定义权限码则拼接customPermissionCode,否则使用枚举
 				String permissionCode = mapping.value()+":"+(optionType==OptionType.CUSTOM?hasPermission.customPermissionCode():optionType.toString());
 				return authorizeManager.authentication(token, permissionCode);
-				
 			}
+				
 		}
 		return AuthContract.AUTHORIZATION_STATUS_SUCCESS;
 	}

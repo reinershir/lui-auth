@@ -59,6 +59,47 @@ public class AuthorizeManager {
 	 * @return
 	 */
 	public int authentication(String token,String permissionCode) {
+		int validateResult = validateTokenAndRenewal(token);
+		if(validateResult==AuthContract.AUTHORIZATION_STATUS_SUCCESS) {
+			String generateToken = token.split("_")[1];
+			String requiredToken = token.split("_")[0];
+			//先从缓存中获取
+			TokenInfo tokenInfo=null;
+			try {
+				tokenInfo = cache.get(generateToken,()->{
+					String tokenInfoJson = DESUtil.decryption(requiredToken, property.getAuthrizationConfig().getTokenSalt());
+					TokenInfo info = JacksonUtil.readValue(tokenInfoJson, TokenInfo.class);
+					//缓存一下token信息
+					cache.put(generateToken, info);
+					return info;
+				});
+			} catch (ExecutionException | InvalidCacheLoadException e1) {
+				return AuthContract.AUTHORIZATION_STATUS_ILLEGAL;
+			}
+			
+			String permissionRedisKey = tokenInfo.getUserId()+AuthContract.TEMPORARY_PERMISSION_KEY;
+			//存在权限通过请求
+			if(redisTemplate.opsForSet().isMember(permissionRedisKey, permissionCode)) {
+				//续期权限数据
+				redisTemplate.expire(permissionRedisKey, property.getAuthrizationConfig().getTokenExpireTime(),TimeUnit.SECONDS);
+				return AuthContract.AUTHORIZATION_STATUS_SUCCESS;
+			}
+			//否则没有权限
+			return AuthContract.AUTHORIZATION_STATUS_NO_PERMISSION;
+		}
+		return validateResult;
+		
+	}
+	
+	/**
+	 * @Title: validateTokenAndRenewal
+	 * @Description:   验证token是否有效并续期
+	 * @author xh
+	 * @date 2020年12月4日
+	 * @param token 未解密前的token
+	 * @return 返回验证结果，参考常量：@see io.github.reinershir.auth.contract.AuthContract
+	 */
+	public int validateTokenAndRenewal(String token) {
 		if(StringUtils.isEmpty(token)) {
 			logger.error("Authentication Token Is Null!");
 			return AuthContract.AUTHORIZATION_STATUS_ILLEGAL;
@@ -83,43 +124,7 @@ public class AuthorizeManager {
 		}
 		//续期token
 		redisTemplate.expire(generateToken, property.getAuthrizationConfig().getTokenExpireTime(),TimeUnit.SECONDS);
-		
-		//先从缓存中获取
-		TokenInfo tokenInfo=null;
-		try {
-			tokenInfo = cache.get(generateToken,()->{
-				String tokenInfoJson = DESUtil.decryption(requiredToken, property.getAuthrizationConfig().getTokenSalt());
-				TokenInfo info = JacksonUtil.readValue(tokenInfoJson, TokenInfo.class);
-				//缓存一下token信息
-				cache.put(generateToken, info);
-				return info;
-			});
-		} catch (ExecutionException | InvalidCacheLoadException e1) {
-			return AuthContract.AUTHORIZATION_STATUS_ILLEGAL;
-		}
-		
-		String permissionRedisKey = tokenInfo.getUserId()+AuthContract.TEMPORARY_PERMISSION_KEY;
-		//存在权限通过请求
-		if(redisTemplate.opsForSet().isMember(permissionRedisKey, permissionCode)) {
-			//续期权限数据
-			redisTemplate.expire(permissionRedisKey, property.getAuthrizationConfig().getTokenExpireTime(),TimeUnit.SECONDS);
-			return AuthContract.AUTHORIZATION_STATUS_SUCCESS;
-		}
-		
-//		//看看是否有临时权限
-//		String temporaryPermissionKey = tokenInfo.getUserId()+AuthContract.TEMPORARY_PERMISSION_KEY;
-//		//判断是否存在或过期
-//		if(redisTemplate.opsForValue().getOperations().getExpire(temporaryPermissionKey)<1) {
-//			logger.warn("No permission. user id:{},user type:{}",tokenInfo.getUserId(),tokenInfo.getUserType());
-//			return AuthContract.AUTHORIZATION_STATUS_NO_PERMISSION;
-//		}
-		
-		//存在权限通过请求
-//		if(redisTemplate.opsForSet().isMember(temporaryPermissionKey, permissionCode)) {
-//			return AuthContract.AUTHORIZATION_STATUS_SUCCESS;
-//		}
-		
-		return AuthContract.AUTHORIZATION_STATUS_NO_PERMISSION;
+		return AuthContract.AUTHORIZATION_STATUS_SUCCESS;
 	}
 	
 	
