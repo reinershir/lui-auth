@@ -18,7 +18,7 @@
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>0.0.21-RELEASE</version>
+	<version>0.0.22-RELEASE</version>
 </dependency>
 
 <dependency>
@@ -92,7 +92,7 @@ public class WebMvcConfig  implements WebMvcConfigurer {
 ```java
 @RequestMapping("test")
 @RestController
-@PermissionMapping(value = "TEST",name = "测试功能管理",parentPermissionCode = "TEST:VIEW",isParentNode = true)
+@PermissionMapping(value = "TEST")
 public class ExampController {
 
 	@Permission(name = "测试redis",value = OptionType.LIST)
@@ -144,8 +144,8 @@ public class LoginController {
 `intergrateConfig.enable=true` 开启时会自动生成3张表，分别为角色表、菜单表、角色权限表，3张表提供增删改查接口  
 
 *跳过权限验证：*  
-1、控制器上不加注解
-2、使用注解跳过单个接口,示例： `@Permission(OptionType.SKIP)` 
+1、控制器和方法上都不加注解
+2、控制器类上加了注解，使用注解跳过单个接口,示例： `@Permission(OptionType.SKIP)` 
 
 # 角色、菜单集成功能使用示例
 
