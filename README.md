@@ -324,6 +324,10 @@ public class WebConfig{
 	public RequestLogger initRequestLogger(){
 		return new MyRequestLogger();  //返回自己定义的日志处理类，该类需要实现RequestLogger接口
 	}
+	
+	public MyRequestLogger implements RequestLogger{
+	  // ......
+	}
 }
 ```
 
