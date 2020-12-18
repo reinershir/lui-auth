@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import io.github.reinershir.auth.config.property.AuthrizationConfig;
 import io.github.reinershir.auth.config.property.IntegrateConfig;
+import io.github.reinershir.auth.config.property.SercurityConfig;
 import io.github.reinershir.auth.core.integrate.GenerateTable;
 import io.github.reinershir.auth.core.integrate.generator.MenuGenerator;
 import io.github.reinershir.auth.core.integrate.generator.RoleGenerator;
@@ -24,6 +25,8 @@ public class AuthorizationProperty implements InitializingBean{
 	@NestedConfigurationProperty
 	private IntegrateConfig intergrateConfig;
 	
+	@NestedConfigurationProperty
+	private SercurityConfig securityConfig;
 	
 	public AuthrizationConfig getAuthrizationConfig() {
 		return authrizationConfig;
@@ -41,6 +44,13 @@ public class AuthorizationProperty implements InitializingBean{
 		this.intergrateConfig = intergrateConfig;
 	}
 
+	public SercurityConfig getSecurityConfig() {
+		return securityConfig;
+	}
+
+	public void setSecurityConfig(SercurityConfig securityConfig) {
+		this.securityConfig = securityConfig;
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {

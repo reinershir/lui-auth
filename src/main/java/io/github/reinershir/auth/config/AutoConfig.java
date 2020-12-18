@@ -1,7 +1,10 @@
 package io.github.reinershir.auth.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -10,9 +13,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import io.github.reinershir.auth.core.CustomManager;
 import io.github.reinershir.auth.core.integrate.access.MenuAccess;
 import io.github.reinershir.auth.core.integrate.access.RoleAccess;
+import io.github.reinershir.auth.core.security.reqlog.DefaultRequestLogger;
+import io.github.reinershir.auth.core.security.reqlog.RequestLogger;
 import io.github.reinershir.auth.core.support.Appointor;
 import io.github.reinershir.auth.core.support.AuthorizeManager;
 import io.github.reinershir.auth.interceptor.AuthenticationInterceptor;
+import io.github.reinershir.auth.interceptor.RequestFilter;
 
 @Configuration
 @EnableConfigurationProperties(AuthorizationProperty.class)
@@ -29,8 +35,8 @@ public class AutoConfig {
 	}
 	
 	@Bean
-	public AuthenticationInterceptor initAuthenticationInterceptor() {
-		return new AuthenticationInterceptor(redisTemplate,property,initCustomManager(),initAuthorizeManager());
+	public AuthenticationInterceptor initAuthenticationInterceptor(@Autowired(required = false) RequestLogger requestLogger) {
+		return new AuthenticationInterceptor(redisTemplate,property,initCustomManager(),initAuthorizeManager(),requestLogger);
 	}
 	
 	
@@ -71,5 +77,23 @@ public class AutoConfig {
 	public PermissionScanner initScaner() {
 		return new PermissionScanner();
 	}
-
+	
+	@Bean
+	@ConditionalOnProperty(name = "lui-auth.securityConfig.enableRequestLog",havingValue = "true")
+    public FilterRegistrationBean<RequestFilter> registerAuthFilter() {
+        FilterRegistrationBean<RequestFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new RequestFilter());
+        registration.addUrlPatterns("/*");
+        registration.setName("requestFilter");
+        registration.setOrder(1);   
+        return registration;
+    }
+	
+	@Bean
+	@ConditionalOnMissingBean(RequestLogger.class)
+	@ConditionalOnProperty(name = "lui-auth.securityConfig.enableRequestLog",havingValue = "true")
+	public RequestLogger initRequestLogger() {
+		return new DefaultRequestLogger(property.getAuthrizationConfig().getTokenHeaderName(), property.getAuthrizationConfig().getTokenSalt());
+	}
+	
 }

@@ -18,7 +18,7 @@
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>0.0.22-RELEASE</version>
+	<version>0.0.23-RELEASE</version>
 </dependency>
 
 <dependency>
@@ -276,13 +276,70 @@ if(!CollectionUtils.isEmpty(roleIds)) {
 authorizeManager.getRoleAccess().getRoleByUser(userId);
 ```
 
+*只验证Token是否有效示例：*
+```java
+@PermissionMapping("ROLE")
+@Permission(OptionType.LOGIN)
+public class RoleController{
+}
+```
+
+### 开启IP限流功能
+
+添加如下配置
+```yml
+lui-auth:
+  securityConfig:
+    enableRequestLimit: true
+	requestTime: 3000
+	requestLimit: 1
+#	requestLimitStorage: memory #IP限流缓存可选：memory、redis，建议memory内存存储，集群服务建议用redis存储
+```
+
+以上配置为开启全局IP限制，即每个IP 3秒内同一个接口只能请求一次
+
+*针对单个接口/控制器的IP限流配置：* `@RequestLimit(requestLimit = 1,requestTime = 3000)` 可加在控制器类或方法上（优先使用方法上的注解）
+
+
 初始版本还很渣，后续会渐渐的增加功能并优化，逐渐思考新的鉴权方式
+
+### 自动打印请求日志
+
+配置：
+```yml
+lui-auth:
+  securityConfig:
+    enableRequestLog: true
+```
+
+开启后会自动打印请求IP、用户ID、请求参数、请求URI等信息
+
+*自定义日志打印类(需要实现RequestLogger接口)：*
+
+```java
+@Configuration
+public class WebConfig{
+
+	@Bean
+	public RequestLogger initRequestLogger(){
+		return new MyRequestLogger();  //返回自己定义的日志处理类，该类需要实现RequestLogger接口
+	}
+}
+```
+
+当开启自动日志打印开关时拦截器会自动包装HttpServletRequest类，使其IO流可重复读取
+
+#UPDATE Log
+
+*0.10* 增加IP限制功能、增加请求日志自动打印功能
+
+*0.0.3* 增加角色、菜单权限管理功能
 
 # TODO LIST
 
-1、独立为一个单独的鉴权服务，支持微服务注册中心、对称密钥等调用方式	<br/>
+1、独立为一个单独的鉴权服务，支持通过注册中心、HTTP等调用方式	<br/>
 
-2、IP白黑名称	<br/>
+2、IP白黑名单	<br/>
 
 3、用户限流	<br/>
 
@@ -290,7 +347,9 @@ authorizeManager.getRoleAccess().getRoleByUser(userId);
 
 5、支持redisson
 
-6、集成的增删改暂时只支持oracle和mysql
+6、增加支持的数据库
+
+7、恶意IP/域名知识库
 
 
 
