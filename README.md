@@ -52,12 +52,12 @@ spring:
     password: hongzhu123
     # 连接超时时间（毫秒）
     timeout: 3000
-	
+
 lui-auth:
   authrizationConfig: 
     administratorId: 1  #超级管理员用户ID，防止角色被全删无法登陆的情况，该用户ID一登陆即拥有所有权限
     tokenSalt: yorTokenSalt   #生成token的盐
-	tokenExpireTime: 1800   #token失效时间，默认30分钟,单位为秒
+    tokenExpireTime: 1800   #token失效时间，默认30分钟,单位为秒
   intergrateConfig: 
     enable: true   #使用集成的角色、菜单管理功能，将会自动生成三张表，提供增删改查接口
 ```
@@ -291,8 +291,8 @@ public class RoleController{
 lui-auth:
   securityConfig:
     enableRequestLimit: true
-	requestTime: 3000
-	requestLimit: 1
+    requestTime: 3000
+    requestLimit: 1
 #	requestLimitStorage: memory #IP限流缓存可选：memory、redis，建议memory内存存储，集群服务建议用redis存储
 ```
 
@@ -329,7 +329,7 @@ public class WebConfig{
 
 当开启自动日志打印开关时拦截器会自动包装HttpServletRequest类，使其IO流可重复读取
 
-#UPDATE Log
+# UPDATE Log
 
 *0.10* 增加IP限制功能、增加请求日志自动打印功能
 
@@ -341,15 +341,13 @@ public class WebConfig{
 
 2、IP白黑名单	<br/>
 
-3、用户限流	<br/>
+3、数据权限（构想中...）	<br/>
 
-4、数据权限（构想中...）	<br/>
+4、支持redisson
 
-5、支持redisson
+5、增加支持的数据库
 
-6、增加支持的数据库
-
-7、恶意IP/域名知识库
+6、恶意IP/域名知识库
 
 
 
