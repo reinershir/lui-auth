@@ -17,7 +17,7 @@ import io.github.reinershir.auth.annotation.PermissionMapping;
 
 /**
  * 扫描权限注解
- * @author xh
+ * @author reinershireinershir
  *
  */
 public class PermissionScanner implements CommandLineRunner, ApplicationContextAware{

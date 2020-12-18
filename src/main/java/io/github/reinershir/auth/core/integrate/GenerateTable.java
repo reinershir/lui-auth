@@ -19,7 +19,7 @@ public abstract class GenerateTable {
 	/**
 	 * @Title: generate
 	 * @Description:   根据表名自动判断数据库生成表
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月27日
 	 * @param tableName
 	 */

@@ -7,8 +7,7 @@ import io.github.reinershir.auth.core.integrate.GenerateTable;
 
 /**
  * 生成角色表
- * @author xh
- *
+ * @author reinershir
  */
 public class RoleGenerator extends GenerateTable{
 	

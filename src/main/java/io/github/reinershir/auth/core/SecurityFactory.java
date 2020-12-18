@@ -21,7 +21,7 @@ public class SecurityFactory {
 	 * 
 	 * @Title: 根据参数返回不同的认证执行者
 	 * @Description:   
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月11日
 	 * @param handler
 	 * @param httpServletRequest

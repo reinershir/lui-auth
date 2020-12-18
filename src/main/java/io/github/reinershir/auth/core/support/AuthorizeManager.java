@@ -52,7 +52,7 @@ public class AuthorizeManager {
 	/**
 	 * @Title: authentication
 	 * @Description:   验证该用户是否拥有指定权限
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月13日
 	 * @param token 
 	 * @param permissionCode 要验证的权限码
@@ -94,7 +94,7 @@ public class AuthorizeManager {
 	/**
 	 * @Title: validateTokenAndRenewal
 	 * @Description:   验证token是否有效并续期
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年12月4日
 	 * @param token 未解密前的token
 	 * @return 返回验证结果，参考常量：@see io.github.reinershir.auth.contract.AuthContract
@@ -133,7 +133,7 @@ public class AuthorizeManager {
 	/**
 	 * @Title: generateToken
 	 * @Description:   生成并保存token
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月11日
 	 * @param userId 用户唯一标识
 	 * @param userType 用户类型,可为空
@@ -218,7 +218,7 @@ public class AuthorizeManager {
 	/**
 	 * @Title: getAllPermissionCodes
 	 * @Description:   获取本服务所有权限码
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月13日
 	 * @return
 	 */

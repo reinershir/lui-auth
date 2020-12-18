@@ -56,7 +56,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	/**
 	 * @Title: convertToTree
 	 * @Description:   将左右值列表转换为树形结构,(由于左右值结构数据查出来的是有顺序的，所以可以按left和right值判断层级关系)
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年12月2日
 	 * @param list
 	 * @return
@@ -81,7 +81,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	/**
 	 * @Title: assemblingChildMenu
 	 * @Description: 根据菜单层级装配为数形结构数据  
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年12月2日
 	 * @param resultList 已装配好的数据
 	 * @param menu 要查找的数据
@@ -111,7 +111,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	/**
 	 * @Title: insertMenu
 	 * @Description: 添加菜单数据
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年12月1日
 	 * @param menu 要添加的菜单数据对象
 	 * @param parentId 指定要添加的父节点ID，即菜单会添加为该菜单ID的子菜单

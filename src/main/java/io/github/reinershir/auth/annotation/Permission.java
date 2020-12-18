@@ -27,7 +27,7 @@ public @interface Permission {
 	/**
 	 * @Title: name
 	 * @Description:   权限名字（可选，可用于记录日志用）
-	 * @author xh
+	 * @author reinershireinershir
 	 * @date 2020年11月12日
 	 * @return String
 	 */

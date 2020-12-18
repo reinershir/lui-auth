@@ -29,7 +29,7 @@ public class Appointor {
 	/**
 	 * @Title: grantTemporaryPermission
 	 * @Description:   授予临时权限
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月13日
 	 * @param userId 用户ID标识
 	 * @param permissionCodes 权限码
@@ -59,7 +59,7 @@ public class Appointor {
 	/**
 	 * @Title: gratPermissionByUser
 	 * @Description:   根据该用户绑定的角色授予临时权限
-	 * @author xh
+	 * @author reinershir
 	 * @param userId 用户ID
 	 * @param expireSeconds 权限失效时间(单位为秒)
 	 * @date 2020年12月1日
@@ -90,7 +90,7 @@ public class Appointor {
 	/**
 	 * @Title: removeAllTemporaryPermission
 	 * @Description:   移除所有权限
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月16日
 	 * @param userId
 	 * @return
@@ -103,7 +103,7 @@ public class Appointor {
 	/**
 	 * @Title: removePermission
 	 * @Description:   移除该用户的指定权限
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月16日
 	 * @param userId
 	 * @param permissionCodes
@@ -117,7 +117,7 @@ public class Appointor {
 	/**
 	 * @Title: grantPermission
 	 * @Description:   永久覆盖授权，将会覆盖老的权限
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月13日
 	 */
 	/*public void grantPermission(String userId,Set<String> permissionCodes) {
@@ -141,7 +141,7 @@ public class Appointor {
 	/**
 	 * @Title: addPermission
 	 * @Description:   为用户添加永久权限，即在原有权限的基础上添加新的权限
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月13日
 	 * @param userId 用户ID
 	 * @param permisionCodes 权限码

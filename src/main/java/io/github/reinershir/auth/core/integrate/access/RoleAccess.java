@@ -217,7 +217,7 @@ public class RoleAccess extends AbstractAccess<Role>{
 	/**
 	 * @Title: bindRoleForUser
 	 * @Description:  为用户绑定角色，会覆盖老的绑定关系
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年12月1日
 	 * @param userId 用户ID
 	 * @param roleIds 角色ID
@@ -254,7 +254,7 @@ public class RoleAccess extends AbstractAccess<Role>{
 	/**
 	 * @Title: getRoleByUser
 	 * @Description:   获取该用户绑定的角色ID
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年12月1日
 	 * @param userId
 	 * @return  返回角色ID列表

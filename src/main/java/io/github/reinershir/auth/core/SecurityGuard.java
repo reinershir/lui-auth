@@ -7,7 +7,7 @@ import org.springframework.web.method.HandlerMethod;
 
 /**
  * 身份验证接口
- * @author xh
+ * @author reinershir
  *
  */
 public interface SecurityGuard {
@@ -15,7 +15,7 @@ public interface SecurityGuard {
 	/**
 	 * @Title: authorization
 	 * @Description: 用于拦截器验证用户的请求权限
-	 * @author xh
+	 * @author reinershir
 	 * @date 2020年11月16日
 	 * @param handler
 	 * @param httpServletRequest
