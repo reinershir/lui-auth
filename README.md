@@ -305,7 +305,7 @@ lui-auth:
 
 ### 自动打印请求日志
 
-配置：
+添加如下配置：
 ```yml
 lui-auth:
   securityConfig:
