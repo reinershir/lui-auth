@@ -14,14 +14,15 @@ public class RequestLog {
 	
 	private String userId;
 	
-	
+	private String requestBody;
 
-	public RequestLog(String requestName, String requestIp, String requestUri, String userId) {
+	public RequestLog(String requestName, String requestIp, String requestUri, String userId,String requestBody) {
 		super();
 		this.requestName = requestName;
 		this.requestIp = requestIp;
 		this.requestUri = requestUri;
 		this.userId = userId;
+		this.requestBody=requestBody;
 		this.date = new Date();
 	}
 
@@ -63,6 +64,14 @@ public class RequestLog {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public String getRequestBody() {
+		return requestBody;
+	}
+
+	public void setRequestBody(String requestBody) {
+		this.requestBody = requestBody;
 	}
 	
 	

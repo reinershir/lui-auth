@@ -93,7 +93,7 @@ public class AutoConfig {
 	@ConditionalOnMissingBean(RequestLogger.class)
 	@ConditionalOnProperty(name = "lui-auth.securityConfig.enableRequestLog",havingValue = "true")
 	public RequestLogger initRequestLogger() {
-		return new DefaultRequestLogger(property.getAuthrizationConfig().getTokenHeaderName(), property.getAuthrizationConfig().getTokenSalt());
+		return new DefaultRequestLogger();
 	}
 	
 }

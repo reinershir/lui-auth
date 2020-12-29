@@ -141,7 +141,22 @@ public class AuthorizeManager {
 	 * @throws Exception
 	 */
 	public String generateToken(@Nonnull String userId,@Nullable Integer userType) throws Exception {
-		return saveTokenToRedis(new TokenInfo(userType,userId,UUID.randomUUID().toString()));
+		return saveTokenToRedis(new TokenInfo(userType,userId,UUID.randomUUID().toString(),null));
+	}
+	
+	/**
+	 * @Title: generateToken
+	 * @Description:   生成并保存token到redis
+	 * @author reinershir
+	 * @date 2020年12月29日
+	 * @param userId
+	 * @param userType
+	 * @param userInfo
+	 * @return
+	 * @throws Exception
+	 */
+	public String generateToken(@Nonnull String userId,@Nullable Integer userType,@Nullable Object userInfo) throws Exception {
+		return saveTokenToRedis(new TokenInfo(userType,userId,UUID.randomUUID().toString(),userInfo));
 	}
 
 	/**

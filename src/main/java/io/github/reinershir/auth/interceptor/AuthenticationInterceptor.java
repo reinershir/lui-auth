@@ -3,8 +3,6 @@ package io.github.reinershir.auth.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -24,6 +22,8 @@ import io.github.reinershir.auth.core.security.reqlimit.impl.RedisStorage;
 import io.github.reinershir.auth.core.security.reqlimit.impl.RequestLimitFeedbacker;
 import io.github.reinershir.auth.core.security.reqlog.RequestLogger;
 import io.github.reinershir.auth.core.support.AuthorizeManager;
+import io.github.reinershir.auth.entity.RequestLog;
+import io.github.reinershir.auth.utils.SecurityUtil;
 
 /**
  * 用于验证权限的拦截器
@@ -40,6 +40,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor{
 	Long requestTime;
 	Integer requestLimit;
 	RequestLogger requestLogger;
+	private Boolean enableRequestLog = false;
+	private String tokenHeaderName;
+	private String tokenSalt;
+	
 	public AuthenticationInterceptor(StringRedisTemplate redisTemplate,AuthorizationProperty property,
 			CustomManager manager,AuthorizeManager authorizeManager,RequestLogger requestLogger) {
 		this.redisTemplate=redisTemplate;
@@ -56,18 +60,23 @@ public class AuthenticationInterceptor implements HandlerInterceptor{
 			requestLimitFeedbacker = new RequestLimitFeedbacker();
 		}
 		this.requestLogger=requestLogger;
+		if(property.getSecurityConfig()!=null) {
+			this.enableRequestLog = property.getSecurityConfig().getEnableRequestLog();
+			this.tokenHeaderName = property.getAuthrizationConfig().getTokenHeaderName();
+			this.tokenSalt = property.getAuthrizationConfig().getTokenSalt();
+		}
+		
 	}
-	
-	@SuppressWarnings("unused")
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) throws Exception {
         if(handler instanceof HandlerMethod) {
             HandlerMethod h = (HandlerMethod)handler;
-            if(requestLogger!=null) {
+            if(requestLogger!=null&&enableRequestLog) {
             	Permission permission = h.getMethodAnnotation(Permission.class);
-            	requestLogger.processRequestLog(httpServletRequest,permission!=null?permission.name():"");
+            	RequestLog requestLog = SecurityUtil.geRequesttLog(httpServletRequest, permission!=null?permission.name():null,
+            			tokenHeaderName, tokenSalt);
+            	requestLogger.processRequestLog(httpServletRequest,requestLog);
             }
             if(limitHandler!=null) {
             	 RequestLimit classAnno = h.getBeanType().getAnnotation(RequestLimit.class);

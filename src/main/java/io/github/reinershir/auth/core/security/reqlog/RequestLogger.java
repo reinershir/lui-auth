@@ -3,6 +3,8 @@ package io.github.reinershir.auth.core.security.reqlog;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.github.reinershir.auth.entity.RequestLog;
+
 public interface RequestLogger {
 
 	/**
@@ -11,9 +13,9 @@ public interface RequestLogger {
 	 * @author reinershir
 	 * @date 2020年12月18日
 	 * @param request 包装后的request
-	 * @param requestName @permission 中name值
+	 * @param requestLog 本次请求的参数
 	 */
-	public void processRequestLog(HttpServletRequest request,String requestName);
+	public abstract void processRequestLog(HttpServletRequest request,RequestLog requestLog);
 	
 	/**
 	 * @Title: processResponseLog
@@ -22,5 +24,5 @@ public interface RequestLogger {
 	 * @date 2020年12月18日
 	 * @param response
 	 */
-	public void processResponseLog(HttpServletResponse response);
+	public abstract void processResponseLog(HttpServletResponse response);
 }

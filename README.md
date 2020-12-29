@@ -326,7 +326,13 @@ public class WebConfig{
 	}
 	
 	public MyRequestLogger implements RequestLogger{
-	  // ......
+	
+		@Override
+		public void processRequestLog(HttpServletRequest request, RequestLog requestLog) {
+			// ......
+			
+		}
+	  
 	}
 }
 ```
@@ -334,6 +340,8 @@ public class WebConfig{
 当开启自动日志打印开关时拦截器会自动包装HttpServletRequest类，使其IO流可重复读取
 
 # UPDATE Log
+
+*0.1.1* 优化请求日志功能，增加token中附带用户信息
 
 *0.10* 增加IP限制功能、增加请求日志自动打印功能
 
