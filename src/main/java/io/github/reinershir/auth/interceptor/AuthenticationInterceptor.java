@@ -3,7 +3,7 @@ package io.github.reinershir.auth.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -31,7 +31,7 @@ import io.github.reinershir.auth.utils.SecurityUtil;
  * @Description:
  */
 public class AuthenticationInterceptor implements HandlerInterceptor{
-	StringRedisTemplate redisTemplate;
+	RedisTemplate<String,String> redisTemplate;
 	AuthorizationProperty property;
 	AuthorizeManager authorizeManager;
 	CustomManager manager;
@@ -44,7 +44,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor{
 	private String tokenHeaderName;
 	private String tokenSalt;
 	
-	public AuthenticationInterceptor(StringRedisTemplate redisTemplate,AuthorizationProperty property,
+	public AuthenticationInterceptor(RedisTemplate<String,String> redisTemplate,AuthorizationProperty property,
 			CustomManager manager,AuthorizeManager authorizeManager,RequestLogger requestLogger) {
 		this.redisTemplate=redisTemplate;
 		this.property=property;

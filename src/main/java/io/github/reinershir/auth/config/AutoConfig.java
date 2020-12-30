@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import io.github.reinershir.auth.core.CustomManager;
@@ -25,10 +25,10 @@ import io.github.reinershir.auth.interceptor.RequestFilter;
 public class AutoConfig {
 
 	AuthorizationProperty property;
-	StringRedisTemplate redisTemplate;
+	RedisTemplate<String,String> redisTemplate;
 	JdbcTemplate jdbcTemplate;
 	
-	public AutoConfig(AuthorizationProperty property,StringRedisTemplate redisTemplate,JdbcTemplate jdbcTemplate) {
+	public AutoConfig(AuthorizationProperty property,RedisTemplate<String,String> redisTemplate,JdbcTemplate jdbcTemplate) {
 		this.property=property;
 		this.redisTemplate=redisTemplate;
 		this.jdbcTemplate=jdbcTemplate;

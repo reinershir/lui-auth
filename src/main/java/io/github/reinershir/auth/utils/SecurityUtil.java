@@ -10,16 +10,16 @@ import org.springframework.util.StringUtils;
 
 import io.github.reinershir.auth.core.security.reqlog.BodyCacheHttpServletRequest;
 import io.github.reinershir.auth.entity.RequestLog;
-import io.github.reinershir.auth.entity.ServiceAuthInfo;
 
 public class SecurityUtil {
 	
 	private static Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
 
-	public String encode(String applicationName,String serviceSecurity) throws Exception {
-		String authJson = JacksonUtil.toJSon(new ServiceAuthInfo(applicationName,MD5.encode(applicationName+serviceSecurity)));
-		return DESUtil.encryption(authJson, serviceSecurity);
-	}
+//	public String encode(String applicationName,String serviceSecurity) throws Exception {
+//		String authJson = JacksonUtil.toJSon(new ServiceAuthInfo(applicationName,MD5.encode(applicationName+serviceSecurity)));
+//		return DESUtil.encryption(authJson, serviceSecurity);
+//	}
+	 
 	
 	
 	public static RequestLog geRequesttLog(HttpServletRequest request,String requestName,String tokenHeaderName,String tokenSalt) {

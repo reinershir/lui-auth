@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -39,10 +39,10 @@ public class RoleAccess extends AbstractAccess<Role>{
 	Logger logger = LoggerFactory.getLogger(getClass());
 
 	String menuTableName;
-	StringRedisTemplate redisTemplate;
+	RedisTemplate<String,String> redisTemplate;
 	RoleRowMapper  mapper = new RoleRowMapper();
 	
-	public RoleAccess(JdbcTemplate jdbcTemplate,String tableName,String menuTableName,StringRedisTemplate redisTemplate) {
+	public RoleAccess(JdbcTemplate jdbcTemplate,String tableName,String menuTableName,RedisTemplate<String,String> redisTemplate) {
 		super(jdbcTemplate,tableName);
 		this.menuTableName=menuTableName;
 		this.redisTemplate=redisTemplate;

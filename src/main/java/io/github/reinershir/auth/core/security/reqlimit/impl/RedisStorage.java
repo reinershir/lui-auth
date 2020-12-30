@@ -3,7 +3,7 @@ package io.github.reinershir.auth.core.security.reqlimit.impl;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 
 import io.github.reinershir.auth.core.security.reqlimit.RequestLimitStorage;
@@ -12,9 +12,9 @@ import io.github.reinershir.auth.utils.JacksonUtil;
 
 public class RedisStorage implements RequestLimitStorage{
 	
-	StringRedisTemplate redisTemplate;
+	RedisTemplate<String,String> redisTemplate;
 	Long reuqestLimitTime;
-	public RedisStorage(StringRedisTemplate redisTemplate,Long reuqestLimitTime) {
+	public RedisStorage(RedisTemplate<String,String> redisTemplate,Long reuqestLimitTime) {
 		this.redisTemplate=redisTemplate;
 		this.reuqestLimitTime=reuqestLimitTime+10000;
 	}

@@ -1,6 +1,7 @@
 package io.github.reinershir.auth.core.support;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -12,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.util.StringUtils;
@@ -33,14 +34,14 @@ import io.github.reinershir.auth.utils.JacksonUtil;
 public class AuthorizeManager {
 
 	AuthorizationProperty property;
-	StringRedisTemplate redisTemplate;
+	RedisTemplate<String,String> redisTemplate;
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	PermissionScanner scanner;
 	Appointor appointor;
 	MenuAccess menuAccess;
 	Cache<String,TokenInfo> cache = null;
 	
-	public AuthorizeManager(AuthorizationProperty property,StringRedisTemplate redisTemplate,PermissionScanner scanner,Appointor appointor,MenuAccess menuAccess) {
+	public AuthorizeManager(AuthorizationProperty property,RedisTemplate<String,String> redisTemplate,PermissionScanner scanner,Appointor appointor,MenuAccess menuAccess) {
 		this.redisTemplate=redisTemplate;
 		this.property=property;
 		cache = CacheBuilder.newBuilder().expireAfterAccess(property.getAuthrizationConfig().getTokenExpireTime(), TimeUnit.SECONDS).maximumSize(500).build();
@@ -146,16 +147,16 @@ public class AuthorizeManager {
 	
 	/**
 	 * @Title: generateToken
-	 * @Description:   生成并保存token到redis
-	 * @author reinershir
-	 * @date 2020年12月29日
-	 * @param userId
-	 * @param userType
-	 * @param userInfo
-	 * @return
+	 * @Description:   生成并保存Token到redis，可附带用户信息到Token中
+	 * @author xh
+	 * @date 2020年12月30日
+	 * @param userId 用户ID
+	 * @param userType 用户类型
+	 * @param userInfo 要保存在Token中的用户信息(注意Long类型会在Json序列化时降为Integer类型)
+	 * @return 生成的Token
 	 * @throws Exception
 	 */
-	public String generateToken(@Nonnull String userId,@Nullable Integer userType,@Nullable Object userInfo) throws Exception {
+	public  String generateToken(@Nonnull String userId,@Nullable Integer userType,@Nullable Map<String,Object> userInfo) throws Exception {
 		return saveTokenToRedis(new TokenInfo(userType,userId,UUID.randomUUID().toString(),userInfo));
 	}
 
@@ -172,7 +173,7 @@ public class AuthorizeManager {
 	}
 	
 	private String saveToken(TokenInfo tokeninfo,Long expireTime) throws Exception {
-		String userId = tokeninfo.getUserId();
+		String userId = tokeninfo.getUserId().toString();
 		//将最后生成的TOKEN使用AES加密
 		String realToken = DESUtil.encryption(JacksonUtil.toJSon(tokeninfo),property.getAuthrizationConfig().getTokenSalt());
 		String generateToken =  DESUtil.encryption(userId,property.getAuthrizationConfig().getTokenSalt());
@@ -201,6 +202,7 @@ public class AuthorizeManager {
 	}
 	
 	/**
+	 * @throws ExecutionException 
 	 * @Description: 解密token，获取token中的信息，token中包含用户类型、用户ID等信息
 	 * @param: @param token
 	 * @param: @return      
@@ -208,9 +210,25 @@ public class AuthorizeManager {
 	 * @throws
 	 */
 	public TokenInfo getTokenInfo(HttpServletRequest request) {
-		String token = request.getHeader(property.getAuthrizationConfig().getTokenHeaderName()).split("_")[0];
-		String tokenInfoJson = DESUtil.decryption(token,property.getAuthrizationConfig().getTokenSalt());
-		return !StringUtils.isEmpty(tokenInfoJson)?JacksonUtil.readValue(tokenInfoJson, TokenInfo.class):null;
+		String token = request.getHeader(property.getAuthrizationConfig().getTokenHeaderName());
+		if(!StringUtils.isEmpty(token)) {
+			String generateToken = token.split("_")[1];
+			String requiredToken = token.split("_")[0];
+			TokenInfo tokenInfo = null;
+			try {
+				tokenInfo = cache.get(generateToken,()->{
+					String tokenInfoJson = DESUtil.decryption(requiredToken, property.getAuthrizationConfig().getTokenSalt());
+					TokenInfo info = JacksonUtil.readValue(tokenInfoJson, TokenInfo.class);
+					//缓存一下token信息
+					cache.put(generateToken, info);
+					return info;
+				});
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+			return tokenInfo;
+		}
+		return null;
 	}
 	
 	public void logout(HttpServletRequest request) {
@@ -222,9 +240,8 @@ public class AuthorizeManager {
 			}
 			TokenInfo tokenInfo = getTokenInfo(request);
 			if(tokenInfo!=null) {
-				this.appointor.removeAllTemporaryPermission(tokenInfo.getUserId());
+				this.appointor.removeAllTemporaryPermission(tokenInfo.getUserId().toString());
 			}
-			
 		}
 		
 	}

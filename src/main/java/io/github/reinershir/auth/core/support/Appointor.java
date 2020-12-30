@@ -8,7 +8,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.util.CollectionUtils;
@@ -20,9 +20,9 @@ import io.github.reinershir.auth.core.model.RolePermission;
 
 public class Appointor {
 
-	StringRedisTemplate redisTemplate;
+	RedisTemplate<String,String> redisTemplate;
 	RoleAccess roleAccess;
-	public Appointor(StringRedisTemplate redisTemplate,RoleAccess roleAccess) {
+	public Appointor(RedisTemplate<String,String> redisTemplate,RoleAccess roleAccess) {
 		this.redisTemplate=redisTemplate;
 		this.roleAccess=roleAccess;
 	}

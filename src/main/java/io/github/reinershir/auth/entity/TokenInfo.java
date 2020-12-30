@@ -1,5 +1,7 @@
 package io.github.reinershir.auth.entity;
 
+import java.util.Map;
+
 public class TokenInfo {
 
 	/**
@@ -18,11 +20,11 @@ public class TokenInfo {
 	/**
 	 * 保存在token中的用户信息
 	 */
-	private Object userInfo;
+	private Map<String,Object> userInfo;
 	
 	public TokenInfo() {}
 	
-	public TokenInfo(Integer userType, String userId,String random,Object userInfo) {
+	public TokenInfo(Integer userType, String userId,String random,Map<String,Object> userInfo) {
 		super();
 		this.userType = userType;
 		this.userId = userId;
@@ -35,9 +37,11 @@ public class TokenInfo {
 	public void setUserType(Integer userType) {
 		this.userType = userType;
 	}
+	
 	public String getUserId() {
 		return userId;
 	}
+
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
@@ -50,13 +54,15 @@ public class TokenInfo {
 		this.random = random;
 	}
 
-	public Object getUserInfo() {
+	public Map<String, Object> getUserInfo() {
 		return userInfo;
 	}
 
-	public void setUserInfo(Object userInfo) {
+	public void setUserInfo(Map<String, Object> userInfo) {
 		this.userInfo = userInfo;
 	}
+
+	
 	
 	
 	

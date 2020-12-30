@@ -10,6 +10,16 @@
   5、使用redis存储权限信息	<br/>
   6、菜单管理支持无限层级树形结构，使用左右值树形结构(modified preorder tree traversal)存储，查询效率非常快
   
+#### 前置环境
+
+* Spring Boot 2.0 +
+
+* Redis 5.0 +
+
+* spring-boot-starter-data-redis 依赖
+
+* JDK 1.8 +
+  
   
 # 开始使用
 

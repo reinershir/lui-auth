@@ -12,7 +12,7 @@ public interface RequestLogger {
 	 * @Description:   每次请求都会调用此方法，用于日志打印，request类已重新包装可重复读取IO流
 	 * @author reinershir
 	 * @date 2020年12月18日
-	 * @param request 包装后的request
+	 * @param request 包装后的request(可重复获取requestBody内容)
 	 * @param requestLog 本次请求的参数
 	 */
 	public abstract void processRequestLog(HttpServletRequest request,RequestLog requestLog);
