@@ -1,7 +1,5 @@
 package io.github.reinershir.auth.utils;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -21,7 +19,17 @@ public class SecurityUtil {
 //	}
 	 
 	
-	
+	/**
+	 * @Title: geRequesttLog
+	 * @Description:   读取requestBody里的内容并缓存流
+	 * @author reinershir
+	 * @date 2021年1月5日
+	 * @param request
+	 * @param requestName 权限注解上配置的功能名称
+	 * @param tokenHeaderName token header名称
+	 * @param tokenSalt token盐
+	 * @return
+	 */
 	public static RequestLog geRequesttLog(HttpServletRequest request,String requestName,String tokenHeaderName,String tokenSalt) {
 		String ip = getIpAddress(request);
 		String token = request.getHeader(tokenHeaderName);
@@ -36,11 +44,8 @@ public class SecurityUtil {
 				logger.error("parse token error ",e);
 			}
 		}
-		try {
-			request = new BodyCacheHttpServletRequest(request);
+		if(request instanceof BodyCacheHttpServletRequest) {
 			body = ((BodyCacheHttpServletRequest) request).getBody();
-		} catch (IOException e) {
-			logger.error("read body exception",e);
 		}
 		return new RequestLog(requestName,ip,uri,userId,body);
 	}
