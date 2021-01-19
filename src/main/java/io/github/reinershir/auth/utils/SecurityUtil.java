@@ -21,7 +21,7 @@ public class SecurityUtil {
 	
 	/**
 	 * @Title: geRequesttLog
-	 * @Description:   读取requestBody里的内容并缓存流
+	 * @Description:  获取本次请求的信息
 	 * @author reinershir
 	 * @date 2021年1月5日
 	 * @param request
@@ -48,6 +48,23 @@ public class SecurityUtil {
 			body = ((BodyCacheHttpServletRequest) request).getBody();
 		}
 		return new RequestLog(requestName,ip,uri,userId,body);
+	}
+	
+	/**
+	 * @Title: getEncodingString
+	 * @Description:   对密码进行MD5 + 盐不可逆编码
+	 * @author reinershir
+	 * @date 2020年12月4日
+	 * @param randomSalt 随机盐，可以使用loginName
+	 * @param salt 固定的盐
+	 * @param password 密码
+	 * @return 编码后的字符串
+	 */
+	public static String getEncodingString(String salt,String randomSalt,String password) {
+		String encodingPwd = MD5.encode(password + salt);
+		//取后8位作为盐增加彩虹表破解难度
+		String requiredPwd = MD5.encode(randomSalt).substring(8)+encodingPwd;
+		return requiredPwd;
 	}
 
 	

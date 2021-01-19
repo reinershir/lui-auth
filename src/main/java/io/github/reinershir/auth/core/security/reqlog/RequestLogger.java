@@ -15,7 +15,7 @@ public interface RequestLogger {
 	 * @param request 包装后的request(可重复获取requestBody内容)
 	 * @param requestLog 本次请求的参数
 	 */
-	public abstract void processRequestLog(HttpServletRequest request,RequestLog requestLog);
+	public void processRequestLog(HttpServletRequest request,RequestLog requestLog);
 	
 	/**
 	 * @Title: processResponseLog
@@ -24,5 +24,5 @@ public interface RequestLogger {
 	 * @date 2020年12月18日
 	 * @param response
 	 */
-	public abstract void processResponseLog(HttpServletResponse response);
+	public void processResponseLog(HttpServletResponse response);
 }

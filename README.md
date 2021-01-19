@@ -28,7 +28,7 @@
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>0.0.23-RELEASE</version>
+	<version>0.1.3-RELEASE</version>
 </dependency>
 
 <dependency>
@@ -185,7 +185,7 @@ public class RoleController {
 	@Permission(name = "添加角色",value = OptionType.ADD)
 	@PostMapping
 	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO dto){
-		if(roleAccess.insert(dto,dto.getMenuIds())>0) {
+		if(roleAccess.insert(dto,dto.getRolePermissions())>0) {
 			return ResponseUtil.generateSuccessDTO();
 		}
 		return ResponseUtil.generateFaileDTO("添加失败！");
