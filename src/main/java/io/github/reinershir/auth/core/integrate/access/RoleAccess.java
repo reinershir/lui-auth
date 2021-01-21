@@ -277,6 +277,10 @@ public class RoleAccess extends AbstractAccess<Role>{
 		return ids;
 	}
 	
+	public Role selectById(Long id) {
+		return super.selectById(id, mapper);
+	}
+	
 	public class RoleRowMapper implements  RowMapper<Role>{
 
 		@Override

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.StringUtils;
@@ -102,6 +103,14 @@ public class AbstractAccess<T> {
 			return jdbcTemplate.update("DELETE FROM "+tableName+" WHERE ID = "+id);
 		}
 		return -1;
+	}
+	
+	protected T selectById(Long id,RowMapper<T> mapper) {
+		try {
+			return jdbcTemplate.queryForObject("SELECT * FROM "+tableName+" WHERE ID = ?", mapper,id);
+		} catch (DataAccessException e) {
+			return null;
+		}
 	}
 	
 }

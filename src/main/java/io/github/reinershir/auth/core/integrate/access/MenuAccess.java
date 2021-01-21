@@ -33,7 +33,6 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	String roleTableName;
 	MenuRowMapper mapper = new MenuRowMapper();
 	
-	//TODO SELECT * FROM TABLE、UPDATE DELETE FROM等封装成方法
 	public MenuAccess(JdbcTemplate jdbcTemplate,String tableName,String roleTableName) {
 		super(jdbcTemplate,tableName);
 		this.jdbcTemplate=jdbcTemplate;
@@ -66,7 +65,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		//记录上一个元素的菜单层级
 		Integer beforeLevel = -999;
 		for (Menu menu : list) {
-			if(beforeLevel==menu.getLevel()-1||beforeLevel==menu.getLevel()) {
+			if(beforeLevel==menu.getLevel()-1||(beforeLevel==menu.getLevel()&&menu.getLevel()!=1)) {
 				//根据层级关系装配菜单数据
 				assemblingChildMenu(resultList,menu);
 			}else {
@@ -187,11 +186,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	}
 	
 	public Menu selectById(Long id) {
-		try {
-			return jdbcTemplate.queryForObject("SELECT * FROM "+tableName+" WHERE ID = ?", mapper,id);
-		} catch (DataAccessException e) {
-			return null;
-		}
+		return super.selectById(id, mapper);
 	}
 	
 	@Transactional
