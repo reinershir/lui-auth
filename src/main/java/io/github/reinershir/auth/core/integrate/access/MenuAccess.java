@@ -243,6 +243,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 			menu.setCreateDate(rs.getDate("CREATE_DATE"));
 			menu.setDescription(rs.getString("DESCRIPTION"));
 			menu.setName(rs.getString("NAME"));
+			menu.setUrl(rs.getString("URL"));
 			menu.setIcon(rs.getString("ICON"));
 			menu.setLeftValue(rs.getInt("LEFT_VALUE"));
 			menu.setRightValue(rs.getInt("RIGHT_VALUE"));
