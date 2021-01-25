@@ -3,7 +3,9 @@ package io.github.reinershir.auth.core.integrate.access;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -11,6 +13,7 @@ import javax.annotation.Nullable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import io.github.reinershir.auth.contract.DbContract;
@@ -111,6 +114,21 @@ public class AbstractAccess<T> {
 		} catch (DataAccessException e) {
 			return null;
 		}
+	}
+	
+	protected List<T> selectByList(Set<Long> ids,RowMapper<T> mapper){
+		if(!CollectionUtils.isEmpty(ids)) {
+			StringBuilder sql = new StringBuilder("SELECT * FROM "+tableName+" WHERE ID in (");
+			for (Iterator<Long> i = ids.iterator(); i.hasNext();) {
+				sql.append(i.next());
+				if(i.hasNext()) {
+					sql.append(",");
+				}
+			}
+			sql.append(")");
+			return jdbcTemplate.query(sql.toString(),mapper);
+		}
+		return null;
 	}
 	
 }

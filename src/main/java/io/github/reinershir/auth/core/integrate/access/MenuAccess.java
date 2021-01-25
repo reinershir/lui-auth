@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -189,13 +190,22 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		return super.selectById(id, mapper);
 	}
 	
+	public List<Menu> selectByList(Set<Long> ids){
+		List<Menu> list = super.selectByList(ids, mapper);
+		if(!CollectionUtils.isEmpty(list)) {
+			return convertToTree(list);
+		}
+		return null;
+		
+	}
+	
 	@Transactional
 	public int updateById(@Nonnull MenuVO menuVO) {
 		if(menuVO!=null&&menuVO.getId()!=null) {
 			Menu menu = new Menu();
 			BeanUtils.copyProperties(menuVO,menu);
 			int result =-1;
-			result = jdbcTemplate.update("UPDATE "+tableName+" SET NAME=?,URL=?,ICON=?,DESCRIPTION=?,PROPERTY=?,UPDATE_DATE=? WHERE ID = ?", new PreparedStatementSetter() {
+			result = jdbcTemplate.update("UPDATE "+tableName+" SET NAME=?,URL=?,ICON=?,DESCRIPTION=?,PROPERTY=?,PERMISSION_CODES=?,UPDATE_DATE=? WHERE ID = ?", new PreparedStatementSetter() {
 				
 				@Override
 				public void setValues(PreparedStatement ps) throws SQLException {
@@ -204,16 +214,15 @@ public class MenuAccess extends AbstractAccess<Menu>{
 					ps.setString(3, menu.getIcon());
 					ps.setString(4, menu.getDescription());
 					ps.setString(5, menu.getProperty());
-					ps.setDate(6, new java.sql.Date(new Date().getTime()));
-					ps.setLong(7, menu.getId());
+					ps.setString(6, menu.getPermissionCodes());
+					ps.setDate(7, new java.sql.Date(new Date().getTime()));
+					ps.setLong(8, menu.getId());
 				}
 			});
 			StringBuilder sql = new StringBuilder("UPDATE ");
 			sql.append(roleTableName);
-			sql.append("_PERMISSION SET PERMISSION_CODES = (SELECT PERMISSION_CODES FROM ");
-			sql.append(tableName);
-			sql.append(" WHERE ID = ?) WHERE MENU_ID = ?");
-			jdbcTemplate.update(sql.toString(),menu.getId(),menu.getId());
+			sql.append("_PERMISSION SET PERMISSION_CODES = ? WHERE MENU_ID = ?");
+			jdbcTemplate.update(sql.toString(),menu.getPermissionCodes(),menu.getId());
 			return result;
 		}
 		return -1;

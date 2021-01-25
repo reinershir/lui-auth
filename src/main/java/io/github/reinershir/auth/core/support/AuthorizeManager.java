@@ -1,6 +1,8 @@
 package io.github.reinershir.auth.core.support;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.google.common.cache.Cache;
@@ -27,6 +30,8 @@ import io.github.reinershir.auth.config.PermissionScanner;
 import io.github.reinershir.auth.contract.AuthContract;
 import io.github.reinershir.auth.core.integrate.access.MenuAccess;
 import io.github.reinershir.auth.core.integrate.access.RoleAccess;
+import io.github.reinershir.auth.core.model.Menu;
+import io.github.reinershir.auth.core.model.RolePermission;
 import io.github.reinershir.auth.entity.TokenInfo;
 import io.github.reinershir.auth.utils.DESUtil;
 import io.github.reinershir.auth.utils.JacksonUtil;
@@ -246,6 +251,30 @@ public class AuthorizeManager {
 		
 	}
 	
+	/**
+	 * @Title: getMenusByUser
+	 * @Description:  获取该用户绑定的角色所拥有的菜单，超级管理员将拥有所有菜单权限
+	 * @author reinershir
+	 * @date 2021年1月25日
+	 * @param userId 用户ID
+	 * @return 菜单列表
+	 */
+	public List<Menu> getMenusByUser(String userId){
+		if(userId.equals(property.getAuthrizationConfig().getAdministratorId())) {
+			return menuAccess.qureyList(null);
+		}else {
+			List<RolePermission> rolePermissions = getRoleAccess().selectRolePermissionByUser(userId);
+			if(!CollectionUtils.isEmpty(rolePermissions)) {
+				Set<Long> ids = new HashSet<>();
+				rolePermissions.forEach((p)->{
+					ids.add(p.getMenuId());
+				});
+				return menuAccess.selectByList(ids);
+			}
+		}
+		
+		return null;
+	}
 	
 	/**
 	 * @Title: getAllPermissionCodes

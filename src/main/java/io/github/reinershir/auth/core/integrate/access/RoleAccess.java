@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,6 +42,7 @@ public class RoleAccess extends AbstractAccess<Role>{
 	String menuTableName;
 	RedisTemplate<String,String> redisTemplate;
 	RoleRowMapper  mapper = new RoleRowMapper();
+	RolePermissionMapper permissionMapper = new RolePermissionMapper();
 	
 	public RoleAccess(JdbcTemplate jdbcTemplate,String tableName,String menuTableName,RedisTemplate<String,String> redisTemplate) {
 		super(jdbcTemplate,tableName);
@@ -64,17 +64,28 @@ public class RoleAccess extends AbstractAccess<Role>{
 	}
 	
 	public List<RolePermission> selectRolePermissionByRole(Long roleId){
-		return jdbcTemplate.query("SELECT * FROM "+tableName+"_PERMISSION WHERE ROLE_ID = ?",new RowMapper<RolePermission>() {
-			@Override
-			public RolePermission mapRow(ResultSet rs, int rowNum) throws SQLException {
-				RolePermission r = new RolePermission();
-				r.setId(rs.getLong("ID"));
-				r.setMenuId(rs.getLong("MENU_ID"));
-				r.setPermissionCodes(rs.getString("PERMISSION_CODES"));
-				r.setRoleId(rs.getLong("ROLE_ID"));
-				return r;
+		return jdbcTemplate.query("SELECT * FROM "+tableName+"_PERMISSION WHERE ROLE_ID = ?",permissionMapper,roleId);
+	}
+	
+	public List<RolePermission> selectRolePermissionByUser(String userId){
+		Set<Long> roleIds = getRoleIdByUser(userId);
+		return selectRolePermissionByList(roleIds);
+		
+	}
+	
+	public List<RolePermission> selectRolePermissionByList(Set<Long> roleIds){
+		if(!CollectionUtils.isEmpty(roleIds)) {
+			StringBuilder sql = new StringBuilder("SELECT * FROM "+tableName+"_PERMISSION WHERE ROLE_ID in (");
+			for (Iterator<Long> i = roleIds.iterator(); i.hasNext();) {
+				sql.append(i.next());
+				if(i.hasNext()) {
+					sql.append(",");
+				}
 			}
-		},roleId);
+			sql.append(")");
+			return jdbcTemplate.query(sql.toString(),permissionMapper);
+		}
+		return null;
 	}
 	
 	@Transactional
@@ -279,28 +290,17 @@ public class RoleAccess extends AbstractAccess<Role>{
 		return ids;
 	}
 	
-	public List<Role> getRoleByUser(String userId){
+	public List<Role> selectRoleByUser(String userId){
 		Set<Long> ids = getRoleIdByUser(userId);
-		return selectByIds(ids);
+		return selectByList(ids);
 	}
 	
 	public Role selectById(Long id) {
 		return super.selectById(id, mapper);
 	}
 	
-	public List<Role> selectByIds(Collection<Long> ids){
-		if(!CollectionUtils.isEmpty(ids)) {
-			StringBuilder sql = new StringBuilder("SELECT * FROM "+tableName+" WHERE ID in (");
-			for (Iterator<Long> i = ids.iterator(); i.hasNext();) {
-				sql.append(i.next());
-				if(i.hasNext()) {
-					sql.append(",");
-				}
-			}
-			sql.append(")");
-			return jdbcTemplate.query(sql.toString(),mapper);
-		}
-		return null;
+	public List<Role> selectByList(Set<Long> ids){
+		return super.selectByList(ids, mapper);
 	}
 	
 	public class RoleRowMapper implements  RowMapper<Role>{
@@ -316,5 +316,17 @@ public class RoleAccess extends AbstractAccess<Role>{
 			return role;
 		}
 		
+	}
+	
+	public class RolePermissionMapper implements RowMapper<RolePermission> {
+		@Override
+		public RolePermission mapRow(ResultSet rs, int rowNum) throws SQLException {
+			RolePermission r = new RolePermission();
+			r.setId(rs.getLong("ID"));
+			r.setMenuId(rs.getLong("MENU_ID"));
+			r.setPermissionCodes(rs.getString("PERMISSION_CODES"));
+			r.setRoleId(rs.getLong("ROLE_ID"));
+			return r;
+		}
 	}
 }
