@@ -67,7 +67,7 @@ public class Appointor {
 	 */
 	public void gratPermissionByUser(String userId,Long expireSeconds) {
 		if(roleAccess!=null) {
-			Set<Long> roleIds = roleAccess.getRoleByUser(userId);
+			Set<Long> roleIds = roleAccess.getRoleIdByUser(userId);
 			if(!CollectionUtils.isEmpty(roleIds)) {
 				Set<String> permissionCodes = new HashSet<>();
 				for (Long roleId : roleIds) {

@@ -6,8 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -259,7 +261,7 @@ public class RoleAccess extends AbstractAccess<Role>{
 	 * @param userId
 	 * @return  返回角色ID列表
 	 */
-	public Set<Long> getRoleByUser(String userId){
+	public Set<Long> getRoleIdByUser(String userId){
 		String key = AuthContract.USER_ROLE_BIND_KEY+userId;
 		Set<String> roleIds = redisTemplate.opsForSet().members(key);
 		Set<Long> ids = new HashSet<>();
@@ -277,8 +279,28 @@ public class RoleAccess extends AbstractAccess<Role>{
 		return ids;
 	}
 	
+	public List<Role> getRoleByUser(String userId){
+		Set<Long> ids = getRoleIdByUser(userId);
+		return selectByIds(ids);
+	}
+	
 	public Role selectById(Long id) {
 		return super.selectById(id, mapper);
+	}
+	
+	public List<Role> selectByIds(Collection<Long> ids){
+		if(!CollectionUtils.isEmpty(ids)) {
+			StringBuilder sql = new StringBuilder("SELECT * FROM "+tableName+" WHERE ID in (");
+			for (Iterator<Long> i = ids.iterator(); i.hasNext();) {
+				sql.append(i.next());
+				if(i.hasNext()) {
+					sql.append(",");
+				}
+			}
+			sql.append(")");
+			return jdbcTemplate.query(sql.toString(),mapper);
+		}
+		return null;
 	}
 	
 	public class RoleRowMapper implements  RowMapper<Role>{

@@ -25,7 +25,7 @@ public class MenuGenerator extends GenerateTable{
 				generateSql.append("CREATE TABLE IF NOT EXISTS "+tableName);
 				generateSql.append(" (  `ID` bigint(0) NOT NULL AUTO_INCREMENT,"
 						+ "  `NAME` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '菜单名称',"
-						+ "  `URL` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '跳转地址',"
+						+ "  `URL` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '跳转地址',"
 						+ "  `ICON` varchar(300) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '图标',"
 						+ "  `PERMISSION_CODES` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '标识权限码',"
 						+ "  `DESCRIPTION` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,"
