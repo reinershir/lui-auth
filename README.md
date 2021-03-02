@@ -29,7 +29,7 @@
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>0.1.3-RELEASE</version>
+	<version>1.0.0-RELEASE</version>
 </dependency>
 
 <dependency>
