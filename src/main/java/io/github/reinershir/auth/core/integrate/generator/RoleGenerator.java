@@ -46,7 +46,16 @@ public class RoleGenerator extends GenerateTable{
 						+ "  INDEX `ROLE_ID_INDEX`(`ROLE_ID`) USING BTREE,"
 						+ "  INDEX `MENU_ID_INDEX`(`MENU_ID`) USING BTREE"
 						+ ") ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
-						+ "");
+						+ ";");
+				
+				generateSql.append("CREATE TABLE IF NOT EXISTS ");
+				generateSql.append(tableName);
+				generateSql.append("_USER");
+				generateSql.append(" (  `ID` bigint(0) NOT NULL AUTO_INCREMENT,"
+						+ "  `ROLE_ID` bigint(0) NOT NULL,"
+						+ "  `USER_ID` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,"
+						+ ") ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
+						+ ";");
 			}else {
 				tableExists = true;
 			}
@@ -72,7 +81,17 @@ public class RoleGenerator extends GenerateTable{
 						+ "  `MENU_ID` number(20) NOT NULL,"
 						+ "  `PERMISSION_CODES` varchar(150) NOT NULL,"
 						+ "  PRIMARY KEY (`ID`),"
-						+ ") COMMENT = '角色表'");
+						+ ") COMMENT = '角色表';");
+				
+				
+				generateSql.append("CREATE TABLE IF NOT EXISTS ");
+				generateSql.append(tableName);
+				generateSql.append("_USER");
+				generateSql.append(" (  `ID` number(20) NOT NULL AUTO_INCREMENT,"
+						+ "  `ROLE_ID` number(20) NOT NULL,"
+						+ "  `USER_ID` varchar(150) NOT NULL"
+						+ "  PRIMARY KEY (`ID`),"
+						+ ") COMMENT = '用户角色关系表';");
 			}else {
 				tableExists = true;
 			}

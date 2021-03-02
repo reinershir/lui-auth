@@ -28,7 +28,7 @@ public class AutoConfig {
 	RedisTemplate<String,String> redisTemplate;
 	JdbcTemplate jdbcTemplate;
 	
-	public AutoConfig(AuthorizationProperty property,RedisTemplate<String,String> redisTemplate,JdbcTemplate jdbcTemplate) {
+	public AutoConfig(AuthorizationProperty property,RedisTemplate<String,String> redisTemplate,@Autowired(required = false) JdbcTemplate jdbcTemplate) {
 		this.property=property;
 		this.redisTemplate=redisTemplate;
 		this.jdbcTemplate=jdbcTemplate;

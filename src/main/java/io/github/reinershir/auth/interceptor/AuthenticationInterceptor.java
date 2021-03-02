@@ -74,7 +74,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor{
             HandlerMethod h = (HandlerMethod)handler;
             if(requestLogger!=null&&enableRequestLog) {
             	Permission permission = h.getMethodAnnotation(Permission.class);
-            	RequestLog requestLog = SecurityUtil.geRequesttLog(httpServletRequest, permission!=null?permission.name():null,
+            	RequestLog requestLog = SecurityUtil.getRequesttLog(httpServletRequest, permission!=null?permission.name():null,
             			tokenHeaderName, tokenSalt);
             	requestLogger.processRequestLog(httpServletRequest,requestLog);
             }

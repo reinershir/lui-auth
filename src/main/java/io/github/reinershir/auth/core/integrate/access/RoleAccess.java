@@ -6,11 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,8 +15,6 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -29,11 +24,10 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import io.github.reinershir.auth.contract.AuthContract;
 import io.github.reinershir.auth.core.model.Role;
 import io.github.reinershir.auth.core.model.RolePermission;
+import io.github.reinershir.auth.core.model.RoleUser;
 
 public class RoleAccess extends AbstractAccess<Role>{
 	
@@ -43,6 +37,7 @@ public class RoleAccess extends AbstractAccess<Role>{
 	RedisTemplate<String,String> redisTemplate;
 	RoleRowMapper  mapper = new RoleRowMapper();
 	RolePermissionMapper permissionMapper = new RolePermissionMapper();
+	RoleUserMapper roleUserMapper = new RoleUserMapper();
 	
 	public RoleAccess(JdbcTemplate jdbcTemplate,String tableName,String menuTableName,RedisTemplate<String,String> redisTemplate) {
 		super(jdbcTemplate,tableName);
@@ -68,12 +63,12 @@ public class RoleAccess extends AbstractAccess<Role>{
 	}
 	
 	public List<RolePermission> selectRolePermissionByUser(String userId){
-		Set<Long> roleIds = getRoleIdByUser(userId);
+		List<Long> roleIds = getRoleIdByUser(userId);;
 		return selectRolePermissionByList(roleIds);
 		
 	}
 	
-	public List<RolePermission> selectRolePermissionByList(Set<Long> roleIds){
+	public List<RolePermission> selectRolePermissionByList(List<Long> roleIds){
 		if(!CollectionUtils.isEmpty(roleIds)) {
 			StringBuilder sql = new StringBuilder("SELECT * FROM "+tableName+"_PERMISSION WHERE ROLE_ID in (");
 			for (Iterator<Long> i = roleIds.iterator(); i.hasNext();) {
@@ -188,27 +183,30 @@ public class RoleAccess extends AbstractAccess<Role>{
 			
 			deleteRolePermission(role.getId());
 			
-			StringBuilder sql = new StringBuilder("INSERT INTO "+tableName+"_PERMISSION(ROLE_ID,MENU_ID,PERMISSION_CODES) SELECT ?,?,");
-			sql.append(menuTableName);
-			sql.append(".ID FROM ");
-			sql.append(menuTableName);
-			sql.append(" WHERE ");
-			sql.append(menuTableName);
-			sql.append(".ID = ?");
-			 
-			jdbcTemplate.batchUpdate(sql.toString(), new BatchPreparedStatementSetter() {
-				@Override
-				public void setValues(PreparedStatement ps, int i) throws SQLException {
-					Long menuId = menuIds.get(i);
-					ps.setLong(1, role.getId());
-					ps.setLong(2, menuId);
-					ps.setLong(3, menuId);
-				}
-				@Override
-				public int getBatchSize() {
-					return menuIds.size();
-				}
-			});
+			
+			if(!CollectionUtils.isEmpty(menuIds)) {
+				StringBuilder sql = new StringBuilder("INSERT INTO "+tableName+"_PERMISSION(ROLE_ID,MENU_ID,PERMISSION_CODES) SELECT ?,?,");
+				sql.append(menuTableName);
+				sql.append(".ID FROM ");
+				sql.append(menuTableName);
+				sql.append(" WHERE ");
+				sql.append(menuTableName);
+				sql.append(".ID = ?");
+				 
+				jdbcTemplate.batchUpdate(sql.toString(), new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						Long menuId = menuIds.get(i);
+						ps.setLong(1, role.getId());
+						ps.setLong(2, menuId);
+						ps.setLong(3, menuId);
+					}
+					@Override
+					public int getBatchSize() {
+						return menuIds.size();
+					}
+				});
+			}
 			return result;
 		}
 		return -1;
@@ -221,7 +219,12 @@ public class RoleAccess extends AbstractAccess<Role>{
 	@Transactional
 	public int deleteById(@Nonnull Long roleId) {
 		if(roleId!=null) {
+			//删除角色绑定的菜单
 			deleteRolePermission(roleId);
+			
+			//删除用户所绑定的角色
+			deleteRoleUserByRoleId(roleId);
+			//删除角色
 			return super.deleteById(roleId);
 		}
 		return -1;
@@ -236,70 +239,110 @@ public class RoleAccess extends AbstractAccess<Role>{
 	 * @param roleIds 角色ID
 	 * @return  true=success,false=faild
 	 */
-	public boolean bindRoleForUser(String userId,Set<Long> roleIds) {
+	@Transactional
+	public boolean bindRoleForUser(String userId,List<Long> roleIds) {
 		if(userId!=null&&!CollectionUtils.isEmpty(roleIds)) {
-			String key = AuthContract.USER_ROLE_BIND_KEY+userId;
-			//为保证原子性，使用lua脚本执行
-			StringBuilder script = new StringBuilder("if redis.call('del',KEYS[1]) >= 0 then return redis.call('sadd',KEYS[1],");
-			for (int i = 0; i < roleIds.size(); i++) {
-				script.append("ARGV[");
-				script.append((i+1));
-				script.append("]");
-				if((i+1)<roleIds.size()) {
-					script.append(",");
+
+			StringBuilder sql = new StringBuilder("DELETE FROM "+tableName+"_USER WHERE USER_ID = ?");
+			jdbcTemplate.update(sql.toString(),userId);
+			
+			sql = new StringBuilder("INSERT INTO "+tableName+"_USER(ROLE_ID,USER_ID) values(?,?)");
+			 
+			jdbcTemplate.batchUpdate(sql.toString(), new BatchPreparedStatementSetter() {
+				@Override
+				public void setValues(PreparedStatement ps, int i) throws SQLException {
+					Long roleId = roleIds.get(i);
+					ps.setLong(1, roleId);
+					ps.setString(2, userId);
 				}
-			}
-			script.append(") else return 0 end ");
-			RedisScript<Long> redisScript = new DefaultRedisScript<>(script.toString(),Long.class); 
-			Set<String> roleIdSet = new HashSet<>();
-			for (Long id : roleIds) {
-				if(id!=null) {
-					roleIdSet.add(id+"");
+				@Override
+				public int getBatchSize() {
+					return roleIds.size();
 				}
-			}
-			redisTemplate.execute(redisScript, Collections.singletonList(key), roleIdSet.toArray());
+			});
+			
 
 			return true;
 		}
 		return false;
 	}
 	
+	private int deleteRoleUserByRoleId(Long roleId) {
+		return jdbcTemplate.update("DELETE FROM "+tableName+"_USER WHERE ROLE_ID = ?",roleId);
+	}
+	
+	/**
+	 * @Title: getRoleUserByUserId
+	 * @Description:   获取该用户绑定的角色ID对象信息
+	 * @author reinershir
+	 * @date 2021年3月2日
+	 * @param userId
+	 * @return  返回角色ID对象列表
+	 */
+	public List<RoleUser> getRoleUserByUserId(String userId){
+		return jdbcTemplate.query("SELECT * FROM "+tableName+"_USER WHERE USER_ID=?",roleUserMapper,userId);
+	}
+	
 	/**
 	 * @Title: getRoleByUser
 	 * @Description:   获取该用户绑定的角色ID
 	 * @author reinershir
-	 * @date 2020年12月1日
+	 * @date 2021年3月2日
 	 * @param userId
-	 * @return  返回角色ID列表
+	 * @return  返回角色ID对象列表
 	 */
-	public Set<Long> getRoleIdByUser(String userId){
-		String key = AuthContract.USER_ROLE_BIND_KEY+userId;
-		Set<String> roleIds = redisTemplate.opsForSet().members(key);
-		Set<Long> ids = new HashSet<>();
-		if(!CollectionUtils.isEmpty(roleIds)) {
-			for (String id : roleIds) {
-				if(!StringUtils.isEmpty(id)) {
-					try {
-						ids.add(Long.parseLong(id));
-					}catch (Exception e) {
-						logger.error("Conversion failed : {}",id);
-					}
-				}
-			}
-		}
-		return ids;
+	public List<Long> getRoleIdByUser(String userId){
+		List<RoleUser> roleUsers = getRoleUserByUserId(userId);
+		return getRoleIdsByRoleUsers(roleUsers);
 	}
 	
 	public List<Role> selectRoleByUser(String userId){
-		Set<Long> ids = getRoleIdByUser(userId);
-		return selectByList(ids);
+		List<Long> roleIds = getRoleIdByUser(userId);
+		return selectByList(roleIds);
+	}
+	
+	/**
+	 * @Title: selectUserIdByRole
+	 * @Description:   根据角色ID获取该角色所绑定的用户ID
+	 * @author reinershir
+	 * @date 2021年3月2日
+	 * @param roleId 角色ID
+	 * @return 返回用户ID列表
+	 */
+	public List<String> selectUserIdByRole(Long roleId){
+		List<RoleUser> roleUsers = jdbcTemplate.query("SELECT * FROM "+tableName+"_USER WHERE ROLE_ID=?",roleUserMapper,roleId);
+		List<String> userIds = new ArrayList<>();
+		if(!CollectionUtils.isEmpty(roleUsers)) {
+			roleUsers.forEach((roleUser)->{
+				userIds.add(roleUser.getUserId());
+			});
+		}
+		return userIds;
+	}
+	
+	/**
+	 * @Title: getRoleIdsByRoleUsers
+	 * @Description:   从角色用户关系对象中抽取角色ID并返回数组
+	 * @author xh
+	 * @date 2021年3月2日
+	 * @param roleUsers
+	 * @return 返回角色ID列表
+	 */
+	private List<Long> getRoleIdsByRoleUsers(List<RoleUser> roleUsers){
+		List<Long> roleIds = new ArrayList<>();
+		if(!CollectionUtils.isEmpty(roleUsers)) {
+			roleUsers.forEach((roleUser)->{
+				roleIds.add(roleUser.getRoleId());
+			});
+		}
+		return roleIds;
 	}
 	
 	public Role selectById(Long id) {
 		return super.selectById(id, mapper);
 	}
 	
-	public List<Role> selectByList(Set<Long> ids){
+	public List<Role> selectByList(List<Long> ids){
 		return super.selectByList(ids, mapper);
 	}
 	
@@ -325,6 +368,17 @@ public class RoleAccess extends AbstractAccess<Role>{
 			r.setId(rs.getLong("ID"));
 			r.setMenuId(rs.getLong("MENU_ID"));
 			r.setPermissionCodes(rs.getString("PERMISSION_CODES"));
+			r.setRoleId(rs.getLong("ROLE_ID"));
+			return r;
+		}
+	}
+	
+	public class RoleUserMapper implements RowMapper<RoleUser> {
+		@Override
+		public RoleUser mapRow(ResultSet rs, int rowNum) throws SQLException {
+			RoleUser r = new RoleUser();
+			r.setId(rs.getLong("ID"));
+			r.setUserId(rs.getString("USER_ID"));
 			r.setRoleId(rs.getLong("ROLE_ID"));
 			return r;
 		}

@@ -8,7 +8,6 @@ import java.sql.Statement;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -190,7 +189,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		return super.selectById(id, mapper);
 	}
 	
-	public List<Menu> selectByList(Set<Long> ids){
+	public List<Menu> selectByList(List<Long> ids){
 		List<Menu> list = super.selectByList(ids, mapper);
 		if(!CollectionUtils.isEmpty(list)) {
 			return convertToTree(list);

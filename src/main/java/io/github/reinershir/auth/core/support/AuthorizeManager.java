@@ -1,7 +1,7 @@
 package io.github.reinershir.auth.core.support;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -259,13 +259,13 @@ public class AuthorizeManager {
 	 * @param userId 用户ID
 	 * @return 菜单列表
 	 */
-	public List<Menu> getMenusByUser(String userId){
-		if(userId.equals(property.getAuthrizationConfig().getAdministratorId())) {
+	public List<Menu> getMenusByUser(@Nonnull String userId){
+		if(!StringUtils.isEmpty(userId)&&userId.equals(property.getAuthrizationConfig().getAdministratorId())) {
 			return menuAccess.qureyList(null);
 		}else {
 			List<RolePermission> rolePermissions = getRoleAccess().selectRolePermissionByUser(userId);
 			if(!CollectionUtils.isEmpty(rolePermissions)) {
-				Set<Long> ids = new HashSet<>();
+				List<Long> ids = new ArrayList<>();
 				rolePermissions.forEach((p)->{
 					ids.add(p.getMenuId());
 				});

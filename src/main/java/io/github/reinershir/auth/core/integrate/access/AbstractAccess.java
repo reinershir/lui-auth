@@ -5,7 +5,6 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -116,7 +115,7 @@ public class AbstractAccess<T> {
 		}
 	}
 	
-	protected List<T> selectByList(Set<Long> ids,RowMapper<T> mapper){
+	protected List<T> selectByList(List<Long> ids,RowMapper<T> mapper){
 		if(!CollectionUtils.isEmpty(ids)) {
 			StringBuilder sql = new StringBuilder("SELECT * FROM "+tableName+" WHERE ID in (");
 			for (Iterator<Long> i = ids.iterator(); i.hasNext();) {

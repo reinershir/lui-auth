@@ -1,6 +1,7 @@
 package io.github.reinershir.auth.config;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +16,9 @@ import io.github.reinershir.auth.core.integrate.generator.RoleGenerator;
 @ConfigurationProperties(prefix = "lui-auth")
 public class AuthorizationProperty implements InitializingBean{
 	JdbcTemplate jdbcTemplate;
-	public AuthorizationProperty(JdbcTemplate jdbcTemplate) {
+	
+	
+	public AuthorizationProperty(@Autowired(required = false) JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate=jdbcTemplate;
 	}
 	

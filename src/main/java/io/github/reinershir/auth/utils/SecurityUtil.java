@@ -30,7 +30,7 @@ public class SecurityUtil {
 	 * @param tokenSalt token盐
 	 * @return
 	 */
-	public static RequestLog geRequesttLog(HttpServletRequest request,String requestName,String tokenHeaderName,String tokenSalt) {
+	public static RequestLog getRequesttLog(HttpServletRequest request,String requestName,String tokenHeaderName,String tokenSalt) {
 		String ip = getIpAddress(request);
 		String token = request.getHeader(tokenHeaderName);
 		String userId = null;

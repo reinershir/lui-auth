@@ -20,6 +20,7 @@
 
 * JDK 1.8 +
   
+* MYSQL 5.7+ OR ORACLE 
   
 # 开始使用
 
@@ -136,7 +137,9 @@ public class LoginController {
 		//登陆验证完成后
 		String userId = "你的用户ID唯一标识";
 		Sint userType = 1; //用户类型标记
-		String token = authorizeManager.generateToken(userId, userType); //如果ID= 配置的administratorId，会拥有所有权限
+		String token = authorizeManager.generateToken(userId, userType); //如果ID={配置的administratorId}，会拥有所有权限
+		//如果使用了集成菜单和角色管理，可通过此方法获取该用户所绑定的菜单权限
+		List<Menu> menus = authorizeManager.getMenusByUser(userId);
 		return token;
 	}
 }
@@ -162,7 +165,7 @@ public class LoginController {
 ### 角色表增删改查接口示例
 
 ```java
-@RequestMapping("role")
+@RequestMapping("roles")
 @RestController
 @PermissionMapping(value="ROLE")
 public class RoleController {
@@ -175,7 +178,7 @@ public class RoleController {
 	}
 
 	@Permission(name = "角色列表",value = OptionType.LIST)
-	@GetMapping("list")
+	@GetMapping
 	public ResultDTO<PageBean<Role>> list(@Validated PageReqDTO reqDTO){
 		List<io.github.reinershir.auth.core.model.Role> list = roleAccess.selectList(reqDTO.getPage(), reqDTO.getPageSize());
 		Long count = roleAccess.selectCount(null);
@@ -221,7 +224,7 @@ public class RoleController {
 ### 菜单表接口使用示例
 
 ```java
-@RequestMapping("Menu")
+@RequestMapping("menus")
 @RestController
 @PermissionMapping(value="MENU")
 public class MenuController {
@@ -234,7 +237,7 @@ public class MenuController {
 	}
 
 	@Permission(name = "菜单列表",value = OptionType.LIST)
-	@GetMapping("list")
+	@GetMapping
 	public ResultDTO<List<Menu>> list(@RequestParam(value="parentId",required = false) Long parentId){
 		return ResponseUtil.generateSuccessDTO(MenuAccess.qureyList(parentId));
 	}
