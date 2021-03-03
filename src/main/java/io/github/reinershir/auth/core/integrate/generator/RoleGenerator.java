@@ -41,7 +41,7 @@ public class RoleGenerator extends GenerateTable{
 				generateSql.append(" (  `ID` bigint(0) NOT NULL AUTO_INCREMENT,"
 						+ "  `ROLE_ID` bigint(0) NOT NULL,"
 						+ "  `MENU_ID` bigint(0) NOT NULL,"
-						+ "  `PERMISSION_CODES` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,"
+						+ "  `PERMISSION_CODES` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci,"
 						+ "  PRIMARY KEY (`ID`) USING BTREE,"
 						+ "  INDEX `ROLE_ID_INDEX`(`ROLE_ID`) USING BTREE,"
 						+ "  INDEX `MENU_ID_INDEX`(`MENU_ID`) USING BTREE"

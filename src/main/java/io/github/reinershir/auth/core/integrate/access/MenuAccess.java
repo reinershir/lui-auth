@@ -63,16 +63,17 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	private List<Menu> convertToTree(List<Menu> list ){
 		List<Menu> resultList = new LinkedList<>();
 		//记录上一个元素的菜单层级
-		Integer beforeLevel = -999;
+		//Integer beforeLevel = -999;
 		for (Menu menu : list) {
-			if(beforeLevel==menu.getLevel()-1||(beforeLevel==menu.getLevel()&&menu.getLevel()!=1)) {
+			//if(beforeLevel==menu.getLevel()-1||(beforeLevel==menu.getLevel()&&menu.getLevel()!=1)) {
+			if(menu.getLevel()>1) {
 				//根据层级关系装配菜单数据
 				assemblingChildMenu(resultList,menu);
 			}else {
 				//如果是父菜单直接加进来
 				resultList.add(menu);
 			}
-			beforeLevel = menu.getLevel();
+			//beforeLevel = menu.getLevel();
 		}
 		return resultList;
 	}
