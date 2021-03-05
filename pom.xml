@@ -24,7 +24,7 @@
          scm:git:https://github.com/reinershir/lui-auth.git
       </developerConnection>
       <url>https://github.com/reinershir/lui-auth</url>
-     <tag>0.1.5</tag>
+     <tag>1.0.0</tag>
   </scm>
     
     <developers>
