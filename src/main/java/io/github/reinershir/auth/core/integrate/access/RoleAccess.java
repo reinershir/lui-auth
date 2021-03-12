@@ -187,7 +187,7 @@ public class RoleAccess extends AbstractAccess<Role>{
 			if(!CollectionUtils.isEmpty(menuIds)) {
 				StringBuilder sql = new StringBuilder("INSERT INTO "+tableName+"_PERMISSION(ROLE_ID,MENU_ID,PERMISSION_CODES) SELECT ?,?,");
 				sql.append(menuTableName);
-				sql.append(".ID FROM ");
+				sql.append(".PERMISSION_CODES FROM ");
 				sql.append(menuTableName);
 				sql.append(" WHERE ");
 				sql.append(menuTableName);
