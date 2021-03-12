@@ -52,6 +52,7 @@ public class PermissionScanner implements CommandLineRunner, ApplicationContextA
              if(mapping==null) {
             	 continue;
              }
+             Permission classPermission = clazz.getAnnotation(Permission.class);
 //             String nodeName = mapping.name();
 //             MenuInfo parentMenu = null;
 //             //父节点
@@ -62,7 +63,8 @@ public class PermissionScanner implements CommandLineRunner, ApplicationContextA
 //             }
              Method[] methods = clazz.getMethods();
              for (Method method : methods) {
-	             Permission permission = method.getAnnotation(Permission.class);
+            	 Permission permission =  method.getAnnotation(Permission.class);
+            	 permission = permission==null?classPermission:permission;
                  if (permission == null) {
                      continue;
                  }
