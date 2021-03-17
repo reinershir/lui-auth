@@ -29,7 +29,7 @@
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>1.0.0-RELEASE</version>
+	<version>1.0.1-RELEASE</version>
 </dependency>
 
 <dependency>
@@ -354,7 +354,7 @@ public class WebConfig{
 
 # UPDATE Log
 
-*1.0.0* 修复了大部分BUG，目前可投入项目中正常使用，修改用户角色关系数据保存在数据中
+*1.0.1* 修复了大部分BUG，目前可投入项目中正常使用，修改用户角色关系数据保存在数据中
 
 *0.1.1* 优化请求日志功能，增加token中附带用户信息
 
