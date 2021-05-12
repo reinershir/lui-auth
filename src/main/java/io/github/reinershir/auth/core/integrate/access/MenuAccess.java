@@ -236,10 +236,22 @@ public class MenuAccess extends AbstractAccess<Menu>{
 			//删除节点
 			result = jdbcTemplate.update("DELETE FROM "+tableName+" WHERE LEFT_VALUE >=? and RIGHT_VALUE <=?",menu.getLeftValue(),menu.getRightValue());
 			//修改受影响的节点
-			jdbcTemplate.update("update MENU set LEFT_VALUE=LEFT_VALUE-(? - ? + 1) where LEFT_VALUE > ?",menu.getRightValue(),menu.getLeftValue(),menu.getLeftValue());
-			jdbcTemplate.update("update MENU set RIGHT_VALUE=RIGHT_VALUE-(? - ? + 1) where RIGHT_VALUE > ?",menu.getRightValue(),menu.getLeftValue(),menu.getRightValue());
+			jdbcTemplate.update("update "+tableName+" set LEFT_VALUE=LEFT_VALUE-(? - ? + 1) where LEFT_VALUE > ?",menu.getRightValue(),menu.getLeftValue(),menu.getLeftValue());
+			jdbcTemplate.update("update "+tableName+" set RIGHT_VALUE=RIGHT_VALUE-(? - ? + 1) where RIGHT_VALUE > ?",menu.getRightValue(),menu.getLeftValue(),menu.getRightValue());
+			//删除角色关联的菜单
+			jdbcTemplate.update("DELETE FROM "+roleTableName+"_PERMISSION WHERE MENU_ID = ?",id);
 		}
 		return result;
+	}
+	
+	public int switchNode(Long id,Long anotherId) {
+		StringBuilder sql = new StringBuilder("UPDATE ");
+		sql.append(tableName);
+		sql.append(" M,");
+		sql.append(tableName);
+		sql.append(" A");
+		sql.append("SET M.LEFT_VALUE = A.LEFT_VALUE,A.LEFT_VALUE = M.LEFT_VALUE,M.RIGHT_VALUE = A.RIGHT_VALUE,A.RIGHT_VALUE = M.RIGHT_VALUE WHERE M.ID=? AND A.ID=? AND M.LEVEL=A.LEVEL");
+		return jdbcTemplate.update(sql.toString(),id,anotherId);
 	}
 	
 	
