@@ -29,7 +29,7 @@
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>1.0.1-RELEASE</version>
+	<version>1.1.0-RELEASE</version>
 </dependency>
 
 <dependency>
@@ -377,6 +377,10 @@ public class WebConfig{
 5、增加支持的数据库
 
 6、恶意IP/域名知识库
+
+7、IP与TOKEN绑定
+
+8、非对称加密请求参数
 
 
 

@@ -254,6 +254,63 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		return jdbcTemplate.update(sql.toString(),id,anotherId);
 	}
 	
+	/*@Transactional
+	public int moveNode(Long moveId,Long targetId) {
+		//TODO LOCK TABLE
+		   
+		Menu moveMenu = this.selectById(moveId);
+		
+		Menu targetMenu = this.selectById(targetId);
+		
+		Integer moveMenuLeft = moveMenu.getLeftValue(); //start
+		
+		Integer moveMenuNewRight = moveMenu.getRightValue()+1; //median
+		
+		Integer targetRight = targetMenu.getRightValue(); //end
+		
+		Integer rightOffset = moveMenu.getRightValue()-moveMenuLeft+1;//gap
+		
+		Integer targetRightOffset = targetRight - moveMenu.getRightValue() -1; //step
+		
+		
+		
+		 if (targetMenu.getLeftValue() >= moveMenuLeft && targetRight <= moveMenu.getRightValue()) {
+			 return -1;
+		 }
+		 StringBuilder sql = new StringBuilder("UPDATE ");
+			sql.append(tableName);
+		 //是否是前移
+		 boolean isMoveBefore =;
+		 if(!isMoveBefore) {
+			 System.out.println("前移");
+			 sql.append(" SET LEFT_VALUE = CASE WHEN LEFT_VALUE >= :moveMenuLeft AND LEFT_VALUE < :moveMenuNewRight THEN (LEFT_VALUE + :rightOffset) ");
+			 sql.append("WHEN LEFT_VALUE >= :moveMenuNewRight AND LEFT_VALUE < :targetRight THEN (LEFT_VALUE - :targetRightOffset ) ");
+			 sql.append("ELSE LEFT_VALUE END,RIGHT_VALUE = CASE WHEN RIGHT_VALUE >= :moveMenuLeft AND RIGHT_VALUE < :moveMenuNewRight ");
+			 sql.append("THEN RIGHT_VALUE + :rightOffset WHEN RIGHT_VALUE >= :moveMenuNewRight AND RIGHT_VALUE < :targetRight ");
+			 sql.append("THEN RIGHT_VALUE - :targetRightOffset ELSE RIGHT_VALUE END");
+		 }else {
+			 System.out.println("后移");
+			sql.append(" SET LEFT_VALUE = CASE WHEN LEFT_VALUE >= :moveMenuLeft AND LEFT_VALUE < :moveMenuNewRight THEN (LEFT_VALUE + :targetRightOffset ) ");
+			sql.append("WHEN LEFT_VALUE >= :moveMenuNewRight AND LEFT_VALUE < :targetRight THEN (LEFT_VALUE - :rightOffset ) ");
+			sql.append("ELSE LEFT_VALUE END,RIGHT_VALUE = CASE WHEN RIGHT_VALUE >= :moveMenuLeft AND RIGHT_VALUE < :moveMenuNewRight THEN RIGHT_VALUE + :targetRightOffset ");
+			sql.append("WHEN RIGHT_VALUE >= :moveMenuNewRight AND RIGHT_VALUE < :targetRight THEN RIGHT_VALUE - :rightOffset ELSE RIGHT_VALUE END");
+		 }
+		
+		
+		
+		
+		MapSqlParameterSource  params = new MapSqlParameterSource();
+		params.addValue("moveMenuLeft", moveMenuLeft);
+		params.addValue("moveMenuNewRight", moveMenuNewRight);
+		params.addValue("targetRight", targetRight);
+		params.addValue("rightOffset", rightOffset);
+		params.addValue("targetRightOffset", targetRightOffset);
+		
+		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+		
+		return namedParameterJdbcTemplate.update(sql.toString(),params);
+	}*/
+	
 	
 	public class MenuRowMapper implements  RowMapper<Menu>{
 
