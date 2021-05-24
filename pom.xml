@@ -6,10 +6,10 @@
   <description>simple authentication frame work</description>
   <name>lui-auth</name>
   <url>https://github.com/reinershir/lui-auth</url>
-  <packaging>jar</packaging>
+  <packaging>jar</packaging> 
   
   <properties>
-        <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
+        <spring-boot.version>2.3.11.RELEASE</spring-boot.version>
         <argLine>-Dfile.encoding=UTF-8</argLine>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
@@ -89,7 +89,13 @@
   	<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+            <exclusions>
+            	<exclusion>
+            		<groupId>org.apache.tomcat.embed</groupId>
+            		<artifactId>tomcat-embed-websocket</artifactId>
+            	</exclusion>
+            </exclusions>
+  	</dependency>
         
         <!--  如其它依赖包中也中此依赖，应提醒排除 -->
         <dependency>
