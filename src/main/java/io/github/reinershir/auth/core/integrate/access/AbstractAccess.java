@@ -130,4 +130,14 @@ public class AbstractAccess<T> {
 		return null;
 	}
 	
+	protected boolean lockTable() {
+		switch(getDbType()) {
+		case DbContract.DB_TYPE_MYSQL:
+			return jdbcTemplate.update("LOCK TABLES "+tableName+" WRITE")>0?true:false;
+		case DbContract.DB_TYPE_ORACAL:
+			return jdbcTemplate.update("LOCK TABLE "+tableName+" IN SHARE ROW EXCLUSIVE")>0?true:false;
+		}
+		return false;
+	}
+	
 }

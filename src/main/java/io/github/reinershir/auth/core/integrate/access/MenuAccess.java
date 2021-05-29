@@ -18,6 +18,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.annotation.Transactional;
@@ -254,63 +256,209 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		return jdbcTemplate.update(sql.toString(),id,anotherId);
 	}
 	
-	/*@Transactional
-	public int moveNode(Long moveId,Long targetId) {
-		//TODO LOCK TABLE
+	/**
+	 * @Title: moveNodeByParentAsLastChild
+	 * @Description: 移动菜单到目标菜单下作为目标菜单的最后一个子菜单
+	 * @author reinershir
+	 * @date 2021年5月26日
+	 * @param moveId 要移动的菜单ID
+	 * @param targetId 目标父菜单ID
+	 * @return
+	 */
+	@Transactional
+	public int moveNodeByParentAsLastChild(Long moveId,Long targetId) {
+		//LOCK TABLE
+		this.lockTable();
 		   
 		Menu moveMenu = this.selectById(moveId);
 		
 		Menu targetMenu = this.selectById(targetId);
 		
-		Integer moveMenuLeft = moveMenu.getLeftValue(); //start
+		Integer moveLeft = moveMenu.getLeftValue(); 
 		
-		Integer moveMenuNewRight = moveMenu.getRightValue()+1; //median
+		Integer moveRight = moveMenu.getRightValue();
+		////要移动菜单的范围，即被移动菜单及其子节点的左右值范围
+		Integer moveDistance = moveRight - moveLeft+1; 
 		
-		Integer targetRight = targetMenu.getRightValue(); //end
+		Integer level = moveMenu.getLevel();
 		
-		Integer rightOffset = moveMenu.getRightValue()-moveMenuLeft+1;//gap
+		Integer targetRight = targetMenu.getRightValue();
 		
-		Integer targetRightOffset = targetRight - moveMenu.getRightValue() -1; //step
-		
-		
-		
-		 if (targetMenu.getLeftValue() >= moveMenuLeft && targetRight <= moveMenu.getRightValue()) {
-			 return -1;
-		 }
-		 StringBuilder sql = new StringBuilder("UPDATE ");
-			sql.append(tableName);
-		 //是否是前移
-		 boolean isMoveBefore =;
-		 if(!isMoveBefore) {
-			 System.out.println("前移");
-			 sql.append(" SET LEFT_VALUE = CASE WHEN LEFT_VALUE >= :moveMenuLeft AND LEFT_VALUE < :moveMenuNewRight THEN (LEFT_VALUE + :rightOffset) ");
-			 sql.append("WHEN LEFT_VALUE >= :moveMenuNewRight AND LEFT_VALUE < :targetRight THEN (LEFT_VALUE - :targetRightOffset ) ");
-			 sql.append("ELSE LEFT_VALUE END,RIGHT_VALUE = CASE WHEN RIGHT_VALUE >= :moveMenuLeft AND RIGHT_VALUE < :moveMenuNewRight ");
-			 sql.append("THEN RIGHT_VALUE + :rightOffset WHEN RIGHT_VALUE >= :moveMenuNewRight AND RIGHT_VALUE < :targetRight ");
-			 sql.append("THEN RIGHT_VALUE - :targetRightOffset ELSE RIGHT_VALUE END");
-		 }else {
-			 System.out.println("后移");
-			sql.append(" SET LEFT_VALUE = CASE WHEN LEFT_VALUE >= :moveMenuLeft AND LEFT_VALUE < :moveMenuNewRight THEN (LEFT_VALUE + :targetRightOffset ) ");
-			sql.append("WHEN LEFT_VALUE >= :moveMenuNewRight AND LEFT_VALUE < :targetRight THEN (LEFT_VALUE - :rightOffset ) ");
-			sql.append("ELSE LEFT_VALUE END,RIGHT_VALUE = CASE WHEN RIGHT_VALUE >= :moveMenuLeft AND RIGHT_VALUE < :moveMenuNewRight THEN RIGHT_VALUE + :targetRightOffset ");
-			sql.append("WHEN RIGHT_VALUE >= :moveMenuNewRight AND RIGHT_VALUE < :targetRight THEN RIGHT_VALUE - :rightOffset ELSE RIGHT_VALUE END");
-		 }
+		Integer targetLevel = targetMenu.getLevel();
 		
 		
 		
+		if(targetMenu.getLeftValue()>=moveLeft&&targetRight<=moveRight) {
+			return -1;
+		}
+		Integer result = 0;
+		//设置子节点的新值 
+		StringBuilder sql = new StringBuilder("UPDATE ");
+		sql.append(tableName);
+		sql.append(" SET LEFT_VALUE = CASE WHEN LEFT_VALUE > :targetRight THEN LEFT_VALUE + :moveDistance ELSE LEFT_VALUE END ,");
+		sql.append("RIGHT_VALUE = CASE WHEN RIGHT_VALUE >= :targetRight THEN RIGHT_VALUE + :moveDistance ELSE RIGHT_VALUE END ");
+		sql.append("WHERE RIGHT_VALUE >= :targetRight");
 		
 		MapSqlParameterSource  params = new MapSqlParameterSource();
-		params.addValue("moveMenuLeft", moveMenuLeft);
-		params.addValue("moveMenuNewRight", moveMenuNewRight);
+		params.addValue("moveLeft", moveLeft);
+		params.addValue("moveRight", moveRight);
 		params.addValue("targetRight", targetRight);
-		params.addValue("rightOffset", rightOffset);
-		params.addValue("targetRightOffset", targetRightOffset);
+		params.addValue("moveDistance", moveDistance);
 		
 		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
 		
-		return namedParameterJdbcTemplate.update(sql.toString(),params);
-	}*/
+		result+=namedParameterJdbcTemplate.update(sql.toString(),params);
+		Integer newDistance = targetRight>=moveLeft?targetRight-moveLeft:moveLeft - targetRight;
+		Integer newDistanceOperator = targetRight >=moveLeft?1:0;
+		params.addValue("newDistanceOperator", newDistanceOperator);
+		params.addValue("newDistance", newDistance);
+		params.addValue("level", level);
+		params.addValue("targetLevel", targetLevel);
+		//移动节点
+		sql = new StringBuilder("UPDATE ");
+		sql.append(tableName);
+		sql.append(" SET LEFT_VALUE = CASE WHEN :newDistanceOperator = 1 THEN LEFT_VALUE + :newDistance ELSE LEFT_VALUE - :newDistance END ,");
+		sql.append("RIGHT_VALUE = CASE WHEN :newDistanceOperator = 1 THEN RIGHT_VALUE + :newDistance ELSE RIGHT_VALUE - :newDistance END ,");
+		sql.append("LEVEL = LEVEL - :level +1 + :targetLevel WHERE RIGHT_VALUE <= :moveRight AND LEFT_VALUE >= :moveLeft");
 	
+		result += namedParameterJdbcTemplate.update(sql.toString(),params);
+		sql = new StringBuilder("UPDATE ");
+		sql.append(tableName);
+		sql.append(" SET LEFT_VALUE = CASE WHEN LEFT_VALUE > :moveRight THEN LEFT_VALUE - :moveDistance ELSE LEFT_VALUE END,");
+		sql.append("RIGHT_VALUE = CASE WHEN RIGHT_VALUE >= :moveRight THEN RIGHT_VALUE - :moveDistance ELSE RIGHT_VALUE END ");
+		sql.append("WHERE RIGHT_VALUE >= :moveRight ");
+		
+		result+= namedParameterJdbcTemplate.update(sql.toString(),params);
+			
+		return result;
+	}
+	
+	/**
+	 * @Title: moveNodeBefore
+	 * @Description:  移动菜单到目标菜单前面 
+	 * @author xh
+	 * @date 2021年5月29日
+	 * @param moveId 被移动菜单ID
+	 * @param targetId 目标菜单ID
+	 * @return
+	 */
+	@Transactional
+	public Integer moveNodeBefore(Long moveId,Long targetId ) {
+		this.lockTable();
+		   
+		Menu moveMenu = this.selectById(moveId);
+		
+		Menu targetMenu = this.selectById(targetId);
+		
+		Integer nodeLeft = moveMenu.getLeftValue();
+		Integer nodeRight = moveMenu.getRightValue();
+		
+		//要移动菜单的范围，即被移动菜单及其子节点的左右值范围
+		Integer nodeDist = nodeRight - nodeLeft+1; //确定要移动的范围
+		Integer level = moveMenu.getLevel();
+		
+		Integer targetLeft = targetMenu.getLeftValue();
+		Integer targetLevel = targetMenu.getLevel();
+		Integer moveNodeLeft = nodeLeft < targetLeft?nodeLeft:nodeLeft + nodeDist;
+		
+		if(targetLeft>=nodeLeft && targetLeft<= nodeRight) {
+			//is child node
+			return -1;
+		}
+		
+		Integer result = 0;
+		
+		StringBuilder sql = new StringBuilder("UPDATE ");
+		sql.append(tableName);
+		sql.append(" SET LEFT_VALUE = CASE WHEN LEFT_VALUE >= :targetLeft THEN LEFT_VALUE + :nodeDist ELSE LEFT_VALUE END ,");
+		sql.append("RIGHT_VALUE = CASE WHEN RIGHT_VALUE >= :targetLeft THEN RIGHT_VALUE + :nodeDist ELSE RIGHT_VALUE END ");
+		sql.append("WHERE RIGHT_VALUE >= :targetLeft");
+		
+		MapSqlParameterSource  params = new MapSqlParameterSource();
+		params.addValue("nodeLeft", nodeLeft);
+		params.addValue("nodeRight", nodeRight);
+		params.addValue("targetLeft", targetLeft);
+		params.addValue("nodeDist", nodeDist);
+		
+		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+		
+		result+=namedParameterJdbcTemplate.update(sql.toString(),params);
+		
+		sql = new StringBuilder("UPDATE ");
+		sql.append(tableName);
+		sql.append(" SET LEFT_VALUE = LEFT_VALUE + :targetLeft - :moveNodeLeft ,");
+		sql.append("RIGHT_VALUE = RIGHT_VALUE + :targetLeft - :moveNodeLeft ,");
+		sql.append("LEVEL = LEVEL - :level + :targetLevel WHERE LEFT_VALUE >= :moveNodeLeft AND RIGHT_VALUE <= :moveNodeLeft + :nodeDist -1 ");
+		
+		params.addValue("moveNodeLeft", moveNodeLeft);
+		params.addValue("level", level);
+		params.addValue("targetLevel", targetLevel);
+		result +=namedParameterJdbcTemplate.update(sql.toString(),params);
+		
+		sql = new StringBuilder("UPDATE ");
+		sql.append(tableName);
+		sql.append(" SET LEFT_VALUE = CASE WHEN LEFT_VALUE >= :moveNodeLeft THEN LEFT_VALUE - :nodeDist ELSE LEFT_VALUE END,");
+		sql.append("RIGHT_VALUE = CASE WHEN RIGHT_VALUE > :moveNodeLeft THEN RIGHT_VALUE - :nodeDist ELSE RIGHT_VALUE END ");
+		sql.append("WHERE RIGHT_VALUE > :moveNodeLeft ");
+		
+		result+= namedParameterJdbcTemplate.update(sql.toString(),params);
+		return result;
+	}
+	
+	@Transactional
+	public Integer moveNodeAfter(Long moveId,Long targetId ) {
+		int result = this.moveNodeBefore(moveId, targetId);
+		result += moveNodeBackward(moveId, targetId);
+		return result;
+	}
+	
+	private int moveNodeBackward(Long moveId,Long targetId) {
+		Menu moveMenu = this.selectById(moveId);
+		
+		Menu targetMenu = this.selectById(targetId);
+		
+		Integer nodeLeft = moveMenu.getLeftValue();
+		Integer nodeRight = moveMenu.getRightValue();
+		
+		Integer targetLeft = targetMenu.getLeftValue();
+		Integer targetRight = targetMenu.getRightValue();
+		
+		Integer nodeDist = nodeRight - nodeLeft+1; //确定要移动的范围
+		
+		Integer targetDist = targetRight - targetLeft+1;
+		
+		List<Long> ids = jdbcTemplate.queryForList("SELECT ID FROM "+tableName+" WHERE LEFT_VALUE >= ? AND RIGHT_VALUE<=?",Long.class,targetLeft,targetRight);
+		
+		
+		StringBuilder sql = new StringBuilder("UPDATE ");
+		sql.append(tableName);
+		sql.append(" SET LEFT_VALUE = CASE WHEN LEFT_VALUE >= :nodeLeft THEN LEFT_VALUE + :targetDist ELSE LEFT_VALUE END ,");
+		sql.append("RIGHT_VALUE = CASE WHEN RIGHT_VALUE <= :nodeRight THEN RIGHT_VALUE + :targetDist ELSE RIGHT_VALUE END ");
+		sql.append("WHERE LEFT_VALUE >= :nodeLeft AND RIGHT_VALUE <= :nodeRight");
+		
+		MapSqlParameterSource  params = new MapSqlParameterSource();
+		params.addValue("nodeLeft", nodeLeft);
+		params.addValue("nodeRight", nodeRight);
+		params.addValue("targetLeft", targetLeft);
+		params.addValue("targetRight", targetRight);
+		params.addValue("nodeDist", nodeDist);
+		params.addValue("targetDist", targetDist);
+		params.addValue("ids", ids);
+		
+		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+		
+		int result=namedParameterJdbcTemplate.update(sql.toString(),params);
+		
+		System.out.println("target dist:"+targetDist+" node dist:"+nodeDist);
+		sql = new StringBuilder("UPDATE ");
+		sql.append(tableName);
+		sql.append(" SET LEFT_VALUE = LEFT_VALUE - :nodeDist,RIGHT_VALUE = RIGHT_VALUE - :nodeDist ");
+		sql.append("WHERE LEFT_VALUE >= :targetLeft AND RIGHT_VALUE <= :targetRight AND ID IN (:ids) ");
+		
+		result+=namedParameterJdbcTemplate.update(sql.toString(),params);
+		
+		return result;
+	}
 	
 	public class MenuRowMapper implements  RowMapper<Menu>{
 
