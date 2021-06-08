@@ -53,7 +53,7 @@ public class RoleGenerator extends GenerateTable{
 				generateSql.append("_USER");
 				generateSql.append(" (  `ID` bigint(0) NOT NULL AUTO_INCREMENT,"
 						+ "  `ROLE_ID` bigint(0) NOT NULL,"
-						+ "  `USER_ID` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,"
+						+ "  `USER_ID` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL"
 						+ ") ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
 						+ ";");
 			}else {
@@ -98,7 +98,7 @@ public class RoleGenerator extends GenerateTable{
 			break;
 		}
 		if(!tableExists) {
-			jdbcTemplate.update(generateSql.toString());
+			jdbcTemplate.execute(generateSql.toString());
 		}
 		
 	}

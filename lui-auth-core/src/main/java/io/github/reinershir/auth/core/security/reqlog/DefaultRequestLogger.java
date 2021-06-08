@@ -1,12 +1,11 @@
 package io.github.reinershir.auth.core.security.reqlog;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import io.github.reinershir.auth.entity.RequestLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.reinershir.auth.entity.RequestLog;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class DefaultRequestLogger implements RequestLogger{
 	
@@ -27,9 +26,12 @@ public class DefaultRequestLogger implements RequestLogger{
 
 	@Override
 	public void processResponseLog(HttpServletResponse response) {
-		RequestLog log = threadLocal.get();
-		logger.info("Request uri:{} \t Request name:{} \t Time consumed:{}ms ",log.getRequestUri(),log.getRequestName(),System.currentTimeMillis()-log.getDate().getTime());
-		
+		try {
+			RequestLog log = threadLocal.get();
+			logger.info("Request uri:{} \t Request name:{} \t Time consumed:{}ms ", log.getRequestUri(), log.getRequestName(), System.currentTimeMillis() - log.getDate().getTime());
+		}finally {
+			threadLocal.remove();
+		}
 	}
 
 }

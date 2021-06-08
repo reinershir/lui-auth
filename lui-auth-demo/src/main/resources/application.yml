@@ -1,0 +1,21 @@
+lui-auth:
+  authrizationConfig:
+    administratorId: 1  #超级管理员用户ID，防止角色被全删无法登陆的情况，该用户ID一登陆即拥有所有权限
+    tokenSalt: yorTokenSalt   #生成token的盐
+    tokenExpireTime: 1800   #token失效时间，默认30分钟,单位为秒
+  intergrateConfig:
+    enable: true   #使用集成的角色、菜单管理功能，将会自动生成三张表，提供增删改查接口
+
+spring:
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+#    password: hongzhu123
+    # 连接超时时间（毫秒）
+    timeout: 3000
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/lui-auth

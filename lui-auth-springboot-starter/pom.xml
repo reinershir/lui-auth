@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>lui-auth-parent</artifactId>
+        <groupId>io.github.reinershir.auth</groupId>
+        <version>1.0.1-RELEASE</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>lui-auth-springboot-starter</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.reinershir.auth</groupId>
+            <artifactId>lui-auth-core</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/spring.factories</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+</project>
