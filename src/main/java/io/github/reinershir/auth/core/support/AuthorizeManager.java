@@ -236,6 +236,14 @@ public class AuthorizeManager {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @Title: logout
+	 * @Description:   获取HTTP头中token信息并登出
+	 * @author Reiner_Shir
+	 * @date 2021年6月17日
+	 * @param request
+	 */
 	public void logout(HttpServletRequest request) {
 		String token =  request.getHeader(property.getAuthrizationConfig().getTokenHeaderName());
 		if(!StringUtils.isEmpty(token)) {
@@ -249,6 +257,20 @@ public class AuthorizeManager {
 			}
 		}
 		
+	}
+	
+	/**
+	 * @Title: logout
+	 * @Description:  根据用户ID登出 
+	 * @author Reiner_Shir
+	 * @date 2021年6月17日
+	 * @param userId
+	 * @throws Exception
+	 */
+	public void logout(String userId) throws Exception {
+		String generateToken =  DESUtil.encryption(userId,property.getAuthrizationConfig().getTokenSalt());
+		redisTemplate.delete(generateToken);
+		this.appointor.removeAllTemporaryPermission(userId);
 	}
 	
 	/**
