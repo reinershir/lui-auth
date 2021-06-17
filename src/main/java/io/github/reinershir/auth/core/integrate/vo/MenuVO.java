@@ -2,8 +2,8 @@ package io.github.reinershir.auth.core.integrate.vo;
 
 import java.io.Serializable;
 
-public class MenuVO implements Serializable{
 
+public class MenuVO implements Serializable{
 /**
 	 * 
 	 */

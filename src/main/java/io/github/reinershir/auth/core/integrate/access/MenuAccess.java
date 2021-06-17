@@ -449,7 +449,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		
 		int result=namedParameterJdbcTemplate.update(sql.toString(),params);
 		
-		System.out.println("target dist:"+targetDist+" node dist:"+nodeDist);
+		//System.out.println("target dist:"+targetDist+" node dist:"+nodeDist);
 		sql = new StringBuilder("UPDATE ");
 		sql.append(tableName);
 		sql.append(" SET LEFT_VALUE = LEFT_VALUE - :nodeDist,RIGHT_VALUE = RIGHT_VALUE - :nodeDist ");

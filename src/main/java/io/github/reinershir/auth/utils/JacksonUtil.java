@@ -32,7 +32,6 @@ public final class JacksonUtil {
 			objectMapper = new ObjectMapper();
 			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		}
-
 		try {
 			return objectMapper.readValue(jsonStr, valueType);
 		} catch (Exception e) {
