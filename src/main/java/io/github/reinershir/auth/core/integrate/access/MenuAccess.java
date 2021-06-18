@@ -289,6 +289,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		
 		
 		if(targetMenu.getLeftValue()>=moveLeft&&targetRight<=moveRight) {
+			unlockTables();
 			return -1;
 		}
 		Integer result = 0;
@@ -329,10 +330,13 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		sql.append("WHERE RIGHT_VALUE >= :moveRight ");
 		
 		result+= namedParameterJdbcTemplate.update(sql.toString(),params);
-			
+		unlockTables();
 		return result;
 	}
 	
+	public Integer moveNodeBefore(Long moveId,Long targetId) {
+		return moveNodeBefore(moveId, targetId,true);
+	}
 	/**
 	 * @Title: moveNodeBefore
 	 * @Description:  移动菜单到目标菜单前面 
@@ -343,7 +347,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	 * @return
 	 */
 	@Transactional
-	public Integer moveNodeBefore(Long moveId,Long targetId ) {
+	public Integer moveNodeBefore(Long moveId,Long targetId,boolean isUnlockTable ) {
 		this.lockTable();
 		   
 		Menu moveMenu = this.selectById(moveId);
@@ -362,6 +366,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		Integer moveNodeLeft = nodeLeft < targetLeft?nodeLeft:nodeLeft + nodeDist;
 		
 		if(targetLeft>=nodeLeft && targetLeft<= nodeRight) {
+			unlockTables();
 			//is child node
 			return -1;
 		}
@@ -402,13 +407,17 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		sql.append("WHERE RIGHT_VALUE > :moveNodeLeft ");
 		
 		result+= namedParameterJdbcTemplate.update(sql.toString(),params);
+		if(isUnlockTable) {
+			unlockTables();
+		}
 		return result;
 	}
 	
 	@Transactional
 	public Integer moveNodeAfter(Long moveId,Long targetId ) {
-		int result = this.moveNodeBefore(moveId, targetId);
+		int result = this.moveNodeBefore(moveId, targetId,false);
 		result += moveNodeBackward(moveId, targetId);
+		unlockTables();
 		return result;
 	}
 	

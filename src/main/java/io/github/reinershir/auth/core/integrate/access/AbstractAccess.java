@@ -140,4 +140,15 @@ public class AbstractAccess<T> {
 		return false;
 	}
 	
+	protected void unlockTables() {
+		switch(getDbType()) {
+		case DbContract.DB_TYPE_MYSQL:
+			jdbcTemplate.update("UNLOCK TABLES ");
+			break;
+		case DbContract.DB_TYPE_ORACAL:
+			//jdbcTemplate.update("LOCK TABLE "+tableName+" IN SHARE ROW EXCLUSIVE");
+		}
+	}
+	
+	
 }
