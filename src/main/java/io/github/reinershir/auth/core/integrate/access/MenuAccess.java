@@ -375,7 +375,6 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		Integer targetLeft = targetMenu.getLeftValue();
 		Integer targetLevel = targetMenu.getLevel();
 		Integer moveNodeLeft = nodeLeft < targetLeft?nodeLeft:nodeLeft + nodeDist;
-		
 		if((targetLeft>=nodeLeft && targetLeft<= nodeRight)||(moveId==targetId)) {
 			unlockTables();
 			//is child node
@@ -427,8 +426,10 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	@Transactional
 	public Integer moveNodeAfter(Long moveId,Long targetId ) {
 		int result = this.moveNodeBefore(moveId, targetId,false);
-		result += moveNodeBackward(moveId, targetId);
-		unlockTables();
+		if(result>0) {
+			result += moveNodeBackward(moveId, targetId);
+			unlockTables();
+		}
 		return result;
 	}
 	
