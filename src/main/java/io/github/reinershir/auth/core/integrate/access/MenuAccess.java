@@ -287,8 +287,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		Integer targetLevel = targetMenu.getLevel();
 		
 		
-		
-		if(targetMenu.getLeftValue()>=moveLeft&&targetRight<=moveRight) {
+		if((targetMenu.getLeftValue()>=moveLeft&&targetRight<=moveRight)||(moveId==targetId)) {
 			unlockTables();
 			return -1;
 		}
@@ -309,12 +308,24 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
 		
 		result+=namedParameterJdbcTemplate.update(sql.toString(),params);
+		
+		//再次查询 
+		moveMenu = this.selectById(moveId);
+		moveLeft = moveMenu.getLeftValue(); 
+		moveRight = moveMenu.getRightValue();
+		
 		Integer newDistance = targetRight>=moveLeft?targetRight-moveLeft:moveLeft - targetRight;
 		Integer newDistanceOperator = targetRight >=moveLeft?1:0;
 		params.addValue("newDistanceOperator", newDistanceOperator);
 		params.addValue("newDistance", newDistance);
 		params.addValue("level", level);
 		params.addValue("targetLevel", targetLevel);
+		//重新塞入
+		params.addValue("moveLeft", moveLeft);
+		params.addValue("moveRight", moveRight);
+		
+		System.out.println("new Distance:"+newDistance+" level:"+level+" targetLevel:"+ targetLevel+" newDistanceOperator:"+newDistanceOperator);
+		System.out.println("move left:"+moveLeft+" move right:"+moveRight);
 		//移动节点
 		sql = new StringBuilder("UPDATE ");
 		sql.append(tableName);
@@ -365,7 +376,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		Integer targetLevel = targetMenu.getLevel();
 		Integer moveNodeLeft = nodeLeft < targetLeft?nodeLeft:nodeLeft + nodeDist;
 		
-		if(targetLeft>=nodeLeft && targetLeft<= nodeRight) {
+		if((targetLeft>=nodeLeft && targetLeft<= nodeRight)||(moveId==targetId)) {
 			unlockTables();
 			//is child node
 			return -1;
