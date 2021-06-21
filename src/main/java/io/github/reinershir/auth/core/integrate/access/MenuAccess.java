@@ -195,6 +195,8 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	public List<Menu> selectByList(List<Long> ids){
 		List<Menu> list = super.selectByList(ids, mapper);
 		if(!CollectionUtils.isEmpty(list)) {
+			//排序
+			list.sort((m1,m2)-> m2.getLeftValue().compareTo(m1.getLeftValue()));
 			return convertToTree(list);
 		}
 		return null;
