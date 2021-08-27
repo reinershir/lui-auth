@@ -49,7 +49,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 			list =  jdbcTemplate.query("SELECT * FROM "+tableName+" ORDER BY LEFT_VALUE ASC", mapper);
 		}else {
 			Menu parent = selectById(parentId);
-			list = jdbcTemplate.query("SELECT * FROM "+tableName+" WHERE LEFT_VALUE>? AND RIGHT_VALUE < ? ORDER BY LEFT_VALUE", mapper,parent.getLeftValue(),parent.getRightValue());
+			list = jdbcTemplate.query("SELECT * FROM "+tableName+" WHERE LEFT_VALUE>? AND RIGHT_VALUE < ? ORDER BY LEFT_VALUE ASC", mapper,parent.getLeftValue(),parent.getRightValue());
 		}
 		return convertToTree(list);
 	}
@@ -325,9 +325,6 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		//重新塞入
 		params.addValue("moveLeft", moveLeft);
 		params.addValue("moveRight", moveRight);
-		
-		System.out.println("new Distance:"+newDistance+" level:"+level+" targetLevel:"+ targetLevel+" newDistanceOperator:"+newDistanceOperator);
-		System.out.println("move left:"+moveLeft+" move right:"+moveRight);
 		//移动节点
 		sql = new StringBuilder("UPDATE ");
 		sql.append(tableName);
@@ -472,7 +469,6 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		
 		int result=namedParameterJdbcTemplate.update(sql.toString(),params);
 		
-		//System.out.println("target dist:"+targetDist+" node dist:"+nodeDist);
 		sql = new StringBuilder("UPDATE ");
 		sql.append(tableName);
 		sql.append(" SET LEFT_VALUE = LEFT_VALUE - :nodeDist,RIGHT_VALUE = RIGHT_VALUE - :nodeDist ");
