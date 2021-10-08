@@ -1,6 +1,7 @@
 package io.github.reinershir.auth.core.integrate.generator;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import io.github.reinershir.auth.contract.DbContract;
 import io.github.reinershir.auth.core.integrate.GenerateTable;
@@ -64,6 +65,33 @@ public class MenuGenerator extends GenerateTable{
 			}else {
 				tableExists = true;
 			}
+			break;
+			
+		case DbContract.DB_TYPE_POSTGRE:
+			String checkPostgre = "select count(*) from pg_class where relname = '"+tableName.toLowerCase()+"';";
+			SqlRowSet rowset = jdbcTemplate.queryForRowSet(checkPostgre);
+			if(rowset.next()&&rowset.getInt("count")<1) {
+				generateSql.append("CREATE TABLE public.");
+				generateSql.append(tableName);
+				generateSql.append(" (\n"
+						+ "  ID serial4 NOT NULL ,\n"
+						+ "  URL varchar(200) COLLATE pg_catalog.default,\n"
+						+ "  ICON varchar(300) COLLATE pg_catalog.default,\n"
+						+ "  PERMISSION_CODES varchar(150) COLLATE pg_catalog.default NOT NULL,\n"
+						+ "  DESCRIPTION varchar(255) COLLATE pg_catalog.default,\n"
+						+ "  LEFT_VALUE int4 NOT NULL,\n"
+						+ "  RIGHT_VALUE int4 NOT NULL,\n"
+						+ "  LEVEL int2 NOT NULL,\n"
+						+ "  PROPERTY varchar(100) COLLATE pg_catalog.default,\n"
+						+ "  CREATE_DATE date NOT NULL,\n"
+						+ "  UPDATE_DATE date,\n"
+						+ "  PRIMARY KEY (ID)\n"
+						+ ")\n"
+						+ ";");
+			}else {
+				tableExists = true;
+			}
+			
 			break;
 		}
 		if(!tableExists) {

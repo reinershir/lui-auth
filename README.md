@@ -29,7 +29,7 @@
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>1.2.1-RELEASE</version>
+	<version>1.2.2-RELEASE</version>
 </dependency>
 
 <dependency>
@@ -167,7 +167,7 @@ public class LoginController {
 ```java
 @RequestMapping("roles")
 @RestController
-@PermissionMapping(value="ROLE")
+@PermissionMapping(value=ROLE)
 public class RoleController {
 	
 	
@@ -226,7 +226,7 @@ public class RoleController {
 ```java
 @RequestMapping("menus")
 @RestController
-@PermissionMapping(value="MENU")
+@PermissionMapping(value=MENU)
 public class MenuController {
 	
 	
@@ -291,7 +291,7 @@ authorizeManager.getRoleAccess().getRoleByUser(userId);
 
 *只验证Token是否有效示例：*
 ```java
-@PermissionMapping("ROLE")
+@PermissionMapping(ROLE)
 @Permission(OptionType.LOGIN)
 public class RoleController{
 }
@@ -354,6 +354,8 @@ public class WebConfig{
 
 # UPDATE Log
 
+*1.2.2* 新增PostgreSql支持
+
 *1.0.1* 修复了大部分BUG，目前可投入项目中正常使用，修改用户角色关系数据保存在数据中
 
 *0.1.1* 优化请求日志功能，增加token中附带用户信息
@@ -385,7 +387,75 @@ public class WebConfig{
 
 
 
+# 表结构
 
+**PostgreSql**
+
+```sql
+CREATE TABLE public.MENU (
+  ID serial4 NOT NULL ,
+  URL varchar(200) COLLATE "pg_catalog"."default",
+  ICON varchar(300) COLLATE "pg_catalog"."default",
+  PERMISSION_CODES varchar(150) COLLATE "pg_catalog"."default" NOT NULL,
+  DESCRIPTION varchar(255) COLLATE "pg_catalog"."default",
+  LEFT_VALUE int4 NOT NULL,
+  RIGHT_VALUE int4 NOT NULL,
+  LEVEL int2 NOT NULL,
+  PROPERTY varchar(100) COLLATE "pg_catalog"."default",
+  CREATE_DATE date NOT NULL,
+  UPDATE_DATE date,
+  PRIMARY KEY ("ID")
+)
+;
+
+COMMENT ON COLUMN public.MENU."URL" IS '跳转地址';
+
+COMMENT ON COLUMN public.MENU."ICON" IS '图标';
+
+COMMENT ON COLUMN public.MENU."PERMISSION_CODES" IS '权限码';
+
+COMMENT ON COLUMN public.MENU."DESCRIPTION" IS '说明 ';
+
+COMMENT ON COLUMN public.MENU."LEFT_VALUE" IS '左节点值';
+
+COMMENT ON COLUMN public.MENU."RIGHT_VALUE" IS '右节点值';
+
+COMMENT ON COLUMN public.MENU."LEVEL" IS '节点等级';
+
+COMMENT ON COLUMN public.MENU."PROPERTY" IS '属性(自由使用标识)';
+
+COMMENT ON COLUMN public.MENU."CREATE_DATE" IS '创建时间';
+
+COMMENT ON COLUMN public.MENU."UPDATE_DATE" IS '修改时间';
+
+COMMENT ON TABLE public.MENU IS '菜单表';
+
+
+
+
+CREATE TABLE public.ROLE (
+  ID serial4 NOT NULL,
+  ROLE_NAME varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
+  DESCRIPTION varchar(200) COLLATE "pg_catalog"."default",
+  CREATE_DATE date NOT NULL,
+  UPDATE_DATE date,
+  PRIMARY KEY ("ID")
+)
+;
+
+
+COMMENT ON COLUMN public.ROLE."ID" IS 'ID';
+
+COMMENT ON COLUMN public.ROLE."ROLE_NAME" IS '角色名称';
+
+COMMENT ON COLUMN public.ROLE."DESCRIPTION" IS '  说明';
+
+COMMENT ON COLUMN public.ROLE."CREATE_DATE" IS '创建时间';
+
+COMMENT ON COLUMN public.ROLE."UPDATE_DATE" IS '修改时间';
+
+COMMENT ON TABLE public.ROLE IS '角色表';
+```
 
 
 

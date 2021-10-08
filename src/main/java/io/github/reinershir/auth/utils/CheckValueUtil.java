@@ -22,6 +22,8 @@ public class CheckValueUtil {
 			dbType = DbContract.DB_TYPE_MYSQL;
 		}else if(!StringUtils.isEmpty(productName)&&productName.toUpperCase().indexOf(DbContract.DB_TYPE_ORACAL)!=-1) {
 			dbType = DbContract.DB_TYPE_ORACAL;
+		}else if(!StringUtils.isEmpty(productName)&&productName.toUpperCase().indexOf(DbContract.DB_TYPE_POSTGRE)!=-1) {
+			dbType = DbContract.DB_TYPE_POSTGRE;
 		}
 //				else if(!StringUtils.isEmpty(productName)&&productName.toLowerCase().indexOf("postgre")!=-1) {
 //					this.dbType = DbContract.DB_TYPE_POSTGRE;

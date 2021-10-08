@@ -31,6 +31,9 @@ public abstract class GenerateTable {
 			if(dbType ==null) {
 				this.dbType=CheckValueUtil.getDbType(jdbcTemplate);
 			}
+			if(dbType==null){
+				throw new RuntimeException("cannot support database type : "+productName);
+			}
 			return this.dbType;
 		} catch (SQLException e) {
 			e.printStackTrace();
