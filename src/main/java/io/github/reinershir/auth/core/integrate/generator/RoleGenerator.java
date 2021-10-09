@@ -82,7 +82,7 @@ public class RoleGenerator extends GenerateTable{
 						+ "  `MENU_ID` number(20) NOT NULL,"
 						+ "  `PERMISSION_CODES` varchar(150) NOT NULL,"
 						+ "  PRIMARY KEY (`ID`),"
-						+ ") COMMENT = '角色表';");
+						+ ") COMMENT = '角色权限表';");
 				
 				
 				generateSql.append("CREATE TABLE IF NOT EXISTS ");
@@ -109,6 +109,21 @@ public class RoleGenerator extends GenerateTable{
 						+ "  DESCRIPTION varchar(200) COLLATE pg_catalog.default,\n"
 						+ "  CREATE_DATE date NOT NULL,\n"
 						+ "  UPDATE_DATE date,\n"
+						+ "  PRIMARY KEY (ID)\n"
+						+ ")\n"
+						+ ";");
+				
+				generateSql.append("CREATE TABLE public."+tableName+"_USER (\n"
+						+ " ID serial4,"
+						+ "  ROLE_ID int8 NOT NULL,\n"
+						+ "  USER_ID varchar COLLATE pg_catalog.default NOT NULL\n"
+						+ ");");
+				
+				generateSql.append("CREATE TABLE public."+tableName+"_PERMISSION (\n"
+						+ "  ID serial4,\n"
+						+ "  ROLE_ID int8 NOT NULL,\n"
+						+ "  MENU_ID int8 NOT NULL,\n"
+						+ "  PERMISSION_CODES varchar(150),\n"
 						+ "  PRIMARY KEY (ID)\n"
 						+ ")\n"
 						+ ";");

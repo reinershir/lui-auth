@@ -455,6 +455,26 @@ COMMENT ON COLUMN public.ROLE."CREATE_DATE" IS '创建时间';
 COMMENT ON COLUMN public.ROLE."UPDATE_DATE" IS '修改时间';
 
 COMMENT ON TABLE public.ROLE IS '角色表';
+
+-- 关系表
+
+CREATE TABLE public.ROLE_USER (
+  ID serial4,
+  ROLE_ID int8 NOT NULL,
+  USER_ID varchar COLLATE pg_catalog.default NOT NULL
+);
+
+
+CREATE TABLE public.ROLE_MENU (
+  ID serial4,
+  ROLE_ID int8 NOT NULL,
+  MENU_ID int8 NOT NULL,
+  PERMISSION_CODES varchar(150),
+  PRIMARY KEY (ID)
+)
+;
+
+
 ```
 
 
