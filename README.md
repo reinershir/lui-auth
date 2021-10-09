@@ -394,9 +394,10 @@ public class WebConfig{
 ```sql
 CREATE TABLE public.MENU (
   ID serial4 NOT NULL ,
+  NAME varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
   URL varchar(200) COLLATE "pg_catalog"."default",
   ICON varchar(300) COLLATE "pg_catalog"."default",
-  PERMISSION_CODES varchar(150) COLLATE "pg_catalog"."default" NOT NULL,
+  PERMISSION_CODES varchar(150) COLLATE "pg_catalog"."default",
   DESCRIPTION varchar(255) COLLATE "pg_catalog"."default",
   LEFT_VALUE int4 NOT NULL,
   RIGHT_VALUE int4 NOT NULL,
