@@ -75,9 +75,10 @@ public class MenuGenerator extends GenerateTable{
 				generateSql.append(tableName);
 				generateSql.append(" (\n"
 						+ "  ID serial4 NOT NULL ,\n"
+						+ "  NAME varchar(100) COLLATE pg_catalog.default NOT NULL,\n"
 						+ "  URL varchar(200) COLLATE pg_catalog.default,\n"
 						+ "  ICON varchar(300) COLLATE pg_catalog.default,\n"
-						+ "  PERMISSION_CODES varchar(150) COLLATE pg_catalog.default NOT NULL,\n"
+						+ "  PERMISSION_CODES varchar(150) COLLATE pg_catalog.default ,\n"
 						+ "  DESCRIPTION varchar(255) COLLATE pg_catalog.default,\n"
 						+ "  LEFT_VALUE int4 NOT NULL,\n"
 						+ "  RIGHT_VALUE int4 NOT NULL,\n"

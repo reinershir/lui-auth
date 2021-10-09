@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,6 +13,7 @@ import javax.annotation.Nullable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -112,6 +114,19 @@ public class AbstractAccess<T> {
 			return jdbcTemplate.queryForObject("SELECT * FROM "+tableName+" WHERE ID = ?", mapper,id);
 		} catch (DataAccessException e) {
 			return null;
+		}
+	}
+	
+	protected Long getIdByKeyholder(KeyHolder holder) {
+		if(Objects.requireNonNull(holder.getKeys()).size()>1) {
+			Object id = holder.getKeys().get("ID");
+			if(id instanceof Integer) {
+				return ((Integer)id).longValue();
+			}else {
+				return (Long) id;
+			}
+		}else {
+			return holder.getKey().longValue();
 		}
 	}
 	

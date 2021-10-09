@@ -125,7 +125,7 @@ public class RoleAccess extends AbstractAccess<Role>{
 					return ps;
 				}
 			},holder);
-			role.setId(holder.getKey().longValue());
+			role.setId(getIdByKeyholder(holder));
 			return result;
 		}
 		return -1;

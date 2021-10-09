@@ -170,7 +170,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 					return ps;
 				}
 			},holder);
-			menu.setId(holder.getKey().longValue());
+			menu.setId(getIdByKeyholder(holder));
 		}
 		return result;
 	}
