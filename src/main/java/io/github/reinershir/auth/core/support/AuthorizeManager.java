@@ -119,7 +119,7 @@ public class AuthorizeManager {
 		Long expire = redisTemplate.opsForValue().getOperations().getExpire(generateToken);
 		//判断是否存在或过期
 		if(expire<1) {
-			logger.warn("Illegal token : {}",token);
+			logger.warn("expire token : {}",token);
 			return AuthContract.AUTHORIZATION_STATUS_ILLEGAL;
 		}
 		String realToken = redisTemplate.opsForValue().get(generateToken);

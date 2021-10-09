@@ -77,6 +77,18 @@ public class AbstractAccess<T> {
 			sql.append(" AND ROWNUM <= ");
 			sql.append(page*pageSize);
 			break;
+		case DbContract.DB_TYPE_POSTGRE:
+			sql.append("SELECT * FROM ");
+			sql.append(tableName);
+			if(!StringUtils.isEmpty(name)) {
+				sql.append(" WHERE LOCATE(?, "+fieldName+") > 0 ");
+			}
+			sql.append(" ORDER BY CREATE_DATE DESC ");
+			sql.append("LIMIT ");
+			sql.append(pageSize);
+			sql.append(" OFFSET ");
+			sql.append((page-1)*pageSize);
+			break;
 		}
 		
 		List<T> list = null;
