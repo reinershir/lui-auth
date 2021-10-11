@@ -50,8 +50,31 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		}else {
 			Menu parent = selectById(parentId);
 			list = jdbcTemplate.query("SELECT * FROM "+tableName+" WHERE LEFT_VALUE>? AND RIGHT_VALUE < ? ORDER BY LEFT_VALUE ASC", mapper,parent.getLeftValue(),parent.getRightValue());
+			return convertToSingleTree (list);
 		}
 		return convertToTree(list);
+	}
+	
+	/**
+	 * 将根据ID查询父菜单的TREE转换为树结构（必定为单节点树）
+	 * @param list 树列表
+	 * @return
+	 */
+	private List<Menu> convertToSingleTree(List<Menu> list ){
+		List<Menu> resultList = new LinkedList<>();
+		for (Menu menu : list) {
+			if(CollectionUtils.isEmpty(resultList)) {
+				//如果是父菜单直接加进来
+				resultList.add(menu);
+			}else {
+				//根据层级关系装配菜单数据
+				if(!assemblingChildMenu(resultList,menu)) {
+					//未找到子节点，表示为同级
+					resultList.add(menu);
+				}
+			}
+		}
+		return resultList;
 	}
 	
 	/**
@@ -64,10 +87,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	 */
 	private List<Menu> convertToTree(List<Menu> list ){
 		List<Menu> resultList = new LinkedList<>();
-		//记录上一个元素的菜单层级
-		//Integer beforeLevel = -999;
 		for (Menu menu : list) {
-			//if(beforeLevel==menu.getLevel()-1||(beforeLevel==menu.getLevel()&&menu.getLevel()!=1)) {
 			if(menu.getLevel()>1) {
 				//根据层级关系装配菜单数据
 				assemblingChildMenu(resultList,menu);
@@ -87,8 +107,9 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	 * @date 2020年12月2日
 	 * @param resultList 已装配好的数据
 	 * @param menu 要查找的数据
+	 * @return true表示装载为子节点成功，false表示不是节点列表中的子节点
 	 */
-	private void assemblingChildMenu(List<Menu> resultList,Menu menu) {
+	private boolean assemblingChildMenu(List<Menu> resultList,Menu menu) {
 		if(!CollectionUtils.isEmpty(resultList)&&menu!=null) {
 			for (Menu parent : resultList) {
 				//判断是否是该菜单的子节点
@@ -96,7 +117,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 					//双重验证，再通过层级判断下
 					if(menu.getLevel()-1==parent.getLevel()) {
 						parent.getChildren().add(menu);
-						break;
+						return true;
 					}else {
 						//如果层级不对，说明该节点在它子节点下面
 						assemblingChildMenu(parent.getChildren(),menu);
@@ -104,6 +125,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 				}
 			}
 		}
+		return false;
 	}
 	
 	public Long selectCount(@Nullable String menuName) {

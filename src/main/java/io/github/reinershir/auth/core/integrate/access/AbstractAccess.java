@@ -81,7 +81,7 @@ public class AbstractAccess<T> {
 			sql.append("SELECT * FROM ");
 			sql.append(tableName);
 			if(!StringUtils.isEmpty(name)) {
-				sql.append(" WHERE LOCATE(?, "+fieldName+") > 0 ");
+				sql.append(" WHERE "+fieldName+" LIKE '%'||?||'%'");
 			}
 			sql.append(" ORDER BY CREATE_DATE DESC ");
 			sql.append("LIMIT ");
@@ -101,12 +101,23 @@ public class AbstractAccess<T> {
 		return list;
 	}
 	
-	protected Long selectCount(@Nullable String name,String filedName) {
+	protected Long selectCount(@Nullable String name,String fieldName) {
 		StringBuilder sql = new StringBuilder("SELECT COUNT(ID) FROM ");
 		sql.append(tableName);
 		Long count = null;
 		if(!StringUtils.isEmpty(name)) {
-			sql.append(" WHERE LOCATE(?, "+filedName+") > 0 ");
+			switch(getDbType()) {
+			case DbContract.DB_TYPE_MYSQL:
+				sql.append(" WHERE LOCATE(?, "+fieldName+") > 0 ");
+				break;
+			case DbContract.DB_TYPE_ORACAL:
+				sql.append(" WHERE INSTR("+fieldName+",?) > 0");
+				break;
+			case DbContract.DB_TYPE_POSTGRE:
+				sql.append(" WHERE "+fieldName+" LIKE '%'||?||'%'");
+				break;
+			}
+			
 			count = jdbcTemplate.queryForObject(sql.toString(), Long.class,name);
 		}else {
 			count = jdbcTemplate.queryForObject(sql.toString(), Long.class);
