@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import io.github.reinershir.auth.entity.RequestLog;
 
@@ -21,7 +22,8 @@ public class DefaultRequestLogger implements RequestLogger{
 		String ip = log.getRequestIp();
 		String body = log.getRequestBody();
 		String requestName = log.getRequestName();
-		logger.info("Request name:{} \t Request uri:{} \t Request User id:{} \t  Request ip:{} \n  Request body:{}",requestName,uri,userId,ip,body);
+		logger.info("Request name:{} \t Request uri:{} \t Request User id:{} \t  Request ip:{} \n  Request body:{}",requestName,uri,userId,ip,
+				StringUtils.isEmpty(body)?request.getQueryString():body);
 		threadLocal.set(log);
 	}
 
