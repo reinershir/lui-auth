@@ -40,6 +40,10 @@ public class SecurityUtil {
 			try {
 				String userIdStr = token.split("_")[1];
 				userId = DESUtil.decryption(userIdStr,tokenSalt);
+				//截取用户ID
+				if(userId.indexOf("_")!=-1) {
+					userId = token.split("_")[0];
+				}
 			} catch (Exception e) {
 				logger.error("parse token error ",e);
 			}

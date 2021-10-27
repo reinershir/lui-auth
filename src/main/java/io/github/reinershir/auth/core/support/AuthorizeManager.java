@@ -178,7 +178,7 @@ public class AuthorizeManager {
 	}
 	
 	private String saveToken(TokenInfo tokeninfo,Long expireTime) throws Exception {
-		String userId = tokeninfo.getUserId().toString();
+		String userId = tokeninfo.getUserId();
 		//将随机生成的TOKEN使用AES加密
 		String realToken = DESUtil.encryption(JacksonUtil.toJSon(tokeninfo),property.getAuthrizationConfig().getTokenSalt());
 		//生成根据用户ID固定生成的TOKEN
