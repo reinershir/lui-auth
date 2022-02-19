@@ -21,6 +21,10 @@
 * JDK 1.8 +
   
 * MYSQL 5.7+ OR ORACLE 
+
+#### Examp
+
+简单示例地址：https://github.com/reinershir/lui-auth-examp
   
 # 开始使用
 
