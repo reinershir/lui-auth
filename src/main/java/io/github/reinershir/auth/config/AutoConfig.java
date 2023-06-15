@@ -45,8 +45,11 @@ public class AutoConfig {
 		RoleAccess roleAccess =null;
 		MenuAccess menuAccess = null;
 		if(property.getIntergrateConfig()!=null) {
-			roleAccess = initRoleAccess();
-			menuAccess = initMenuAccess();
+			Boolean isEnableIntergrate = null==property.getIntergrateConfig().getEnable()?false:property.getIntergrateConfig().getEnable();
+			if(isEnableIntergrate) {
+				roleAccess = initRoleAccess();
+				menuAccess = initMenuAccess();
+			}
 		}
 		Appointor appointor = new Appointor(redisTemplate, roleAccess);
 		return new AuthorizeManager(property,redisTemplate,initScaner(),appointor,menuAccess);

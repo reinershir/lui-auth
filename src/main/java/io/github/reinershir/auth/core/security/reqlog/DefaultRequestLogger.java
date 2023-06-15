@@ -1,5 +1,7 @@
 package io.github.reinershir.auth.core.security.reqlog;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,13 +26,17 @@ public class DefaultRequestLogger implements RequestLogger{
 		String requestName = log.getRequestName();
 		logger.info("Request name:{} \t Request uri:{} \t Request User id:{} \t  Request ip:{} \n  Request body:{}",requestName,uri,userId,ip,
 				StringUtils.isEmpty(body)?request.getQueryString():body);
+		log.setDate(new Date());
 		threadLocal.set(log);
+		
 	}
 
 	@Override
 	public void processResponseLog(HttpServletResponse response) {
 		RequestLog log = threadLocal.get();
-		logger.info("Request uri:{} \t Request name:{} \t Time consumed:{}ms ",log.getRequestUri(),log.getRequestName(),System.currentTimeMillis()-log.getDate().getTime());
+		if(log!=null) {
+			logger.info("Request uri:{} \t Request name:{} \t Time consumed:{}ms ",log.getRequestUri(),log.getRequestName(),System.currentTimeMillis()-log.getDate().getTime());
+		}
 		
 	}
 

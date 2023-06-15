@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -23,6 +24,7 @@ import io.github.reinershir.auth.core.security.reqlimit.impl.RequestLimitFeedbac
 import io.github.reinershir.auth.core.security.reqlog.RequestLogger;
 import io.github.reinershir.auth.core.support.AuthorizeManager;
 import io.github.reinershir.auth.entity.RequestLog;
+import io.github.reinershir.auth.entity.TokenInfo;
 import io.github.reinershir.auth.utils.SecurityUtil;
 
 /**
@@ -92,7 +94,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor{
             		 reqLimit = this.requestLimit;
             	 }
             	if(!limitHandler.checkLimit(httpServletRequest,reqTime, reqLimit)) {
-            		requestLimitFeedbacker.feedBack(httpServletRequest, httpServletResponse, AuthContract.AUTHORIZATION_STATUS_TOO_FREQUENT);
+            		requestLimitFeedbacker.feedBack(httpServletRequest, httpServletResponse, AuthContract.AUTHORIZATION_STATUS_TOO_MANY_REQUEST);
             		return false;
             	}
             }

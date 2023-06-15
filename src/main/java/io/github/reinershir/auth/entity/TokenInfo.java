@@ -16,6 +16,10 @@ public class TokenInfo {
 	 * 随机生成的token,用于保证每次生成的token不一致
 	 */
 	private String random;
+	/**
+	 * 用户登陆时的IP
+	 */
+	private String ip;
 	
 	/**
 	 * 保存在token中的用户信息
@@ -31,6 +35,16 @@ public class TokenInfo {
 		this.random=random;
 		this.userInfo=userInfo;
 	}
+	
+	public TokenInfo(Integer userType, String userId,String random,String ip,Map<String,Object> userInfo) {
+		super();
+		this.userType = userType;
+		this.userId = userId;
+		this.random=random;
+		this.userInfo=userInfo;
+		this.ip=ip;
+	}
+	
 	public Integer getUserType() {
 		return userType;
 	}
@@ -60,6 +74,14 @@ public class TokenInfo {
 
 	public void setUserInfo(Map<String, Object> userInfo) {
 		this.userInfo = userInfo;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 
 	

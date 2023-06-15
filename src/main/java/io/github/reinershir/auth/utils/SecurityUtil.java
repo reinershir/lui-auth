@@ -1,5 +1,8 @@
 package io.github.reinershir.auth.utils;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -36,7 +39,7 @@ public class SecurityUtil {
 		String userId = null;
 		String body = null;
 		String uri = request.getRequestURI();
-		if(!StringUtils.isEmpty(token)) {
+		if(!StringUtils.isEmpty(token)&&token.indexOf("_")!=-1) {
 			try {
 				String userIdStr = token.split("_")[1];
 				userId = DESUtil.decryption(userIdStr,tokenSalt);
@@ -89,6 +92,17 @@ public class SecurityUtil {
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
             ip = request.getRemoteAddr();  
         }  
+        if (ip!=null&&ip.equalsIgnoreCase("0:0:0:0:0:0:0:1")) {
+            InetAddress inetAddress;
+			try {
+				inetAddress = InetAddress.getLocalHost();
+				String ipAddress = inetAddress.getHostAddress();
+	            ip = ipAddress;
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+            
+        }
         return ip;  
     }  
 }

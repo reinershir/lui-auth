@@ -33,7 +33,7 @@
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>1.2.3-RELEASE</version>
+	<version>1.2.4-RELEASE</version>
 </dependency>
 
 <dependency>
@@ -64,7 +64,7 @@ spring:
     database: 0
     host: 127.0.0.1
     port: 6379
-    password: hongzhu123
+    password: pwd123
     # 连接超时时间（毫秒）
     timeout: 3000
 
@@ -75,6 +75,9 @@ lui-auth:
     tokenExpireTime: 1800   #token失效时间，默认30分钟,单位为秒
   intergrateConfig: 
     enable: true   #使用集成的角色、菜单管理功能，将会自动生成三张表，提供增删改查接口
+  securityConfig:
+    enableRequestLog: true #开启请求日志打印
+    bindIp: false #需要token绑定IP时可设为true
 ```
 
 
@@ -122,6 +125,7 @@ public class ExampController {
 
 权限码可自定义 : `@Permission(name = "测试接口",value = OptionType.CUSTOM,customPermissionCode = "MYCUSTOM")`
 
+当配置`value=OptionType.LOGIN` 时，表示只要拥有合法token即可访问
 
 ## 最后一步，生成token
 
@@ -155,14 +159,57 @@ public class LoginController {
 前端传token时需要在http header里添加：  Access-Token: 登陆接口返回的token  ,header name是可配置的，默认Access-Token
 
 
+# 获取Token中的用户ID
+
+首先注入对象
+
+```java
+@Autowired(required = false)
+AuthorizeManager authorizeManager;
+
+```
+
+根据request对象获取
+
+```java
+@GetMapping
+public Result<String> getUserId(HttpServletRequest request){
+		String userId = authorizeManager.getTokenInfo(request).getUserId();
+}
+```
+
+# Token IP绑定模式
+
+配置文件中：
+
+```yml
+lui-auth:
+  securityConfig:
+    bindIp: true
+```
+
+生成token时将需要绑定的IP传入：
+
+```java
+//SecurityUtil.getIpAddress(request) 可替换为你需要绑定的IP
+String token = authorizeManager.generateToken(userId,userType,SecurityUtil.getIpAddress(request));
+```
+
 
 # 其它说明
 
 `intergrateConfig.enable=true` 开启时会自动生成3张表，分别为角色表、菜单表、角色权限表，3张表提供增删改查接口  
 
 *跳过权限验证：*  
-1、控制器和方法上都不加注解
-2、控制器类上加了注解，使用注解跳过单个接口,示例： `@Permission(OptionType.SKIP)` 
+* 1、控制器和方法上都不加注解
+* 2、控制器类上加了注解，使用注解跳过单个接口,示例： 
+
+```java
+@Permission(OptionType.SKIP)
+public Result<String> login(){
+  //...
+}
+```
 
 # 角色、菜单集成功能使用示例
 
@@ -318,7 +365,6 @@ lui-auth:
 *针对单个接口/控制器的IP限流配置：* `@RequestLimit(requestLimit = 1,requestTime = 3000)` 可加在控制器类或方法上（优先使用方法上的注解）
 
 
-初始版本还很渣，后续会渐渐的增加功能并优化，逐渐思考新的鉴权方式
 
 ### 自动打印请求日志
 
@@ -357,6 +403,9 @@ public class WebConfig{
 当开启自动日志打印开关时拦截器会自动包装HttpServletRequest类，使其IO流可重复读取
 
 # UPDATE Log
+*1.2.4* 修复BUG，新增IP绑定模式,更新获取IP方法
+
+*1.2.3* 修复bug，新增mysql8支持
 
 *1.2.2* 新增PostgreSql支持
 

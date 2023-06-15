@@ -27,6 +27,11 @@ public class SercurityConfig {
 	 * 开启日志请求记录
 	 */
 	private Boolean enableRequestLog=false;
+	
+	/**
+	 * Token强制绑定IP
+	 */
+	private Boolean bindIp=false;
 
 	public Boolean getEnableRequestLimit() {
 		return enableRequestLimit;
@@ -72,6 +77,14 @@ public class SercurityConfig {
 
 	public void setEnableRequestLog(Boolean enableRequestLog) {
 		this.enableRequestLog = enableRequestLog;
+	}
+
+	public Boolean getBindIp() {
+		return bindIp;
+	}
+
+	public void setBindIp(Boolean bindIp) {
+		this.bindIp = bindIp;
 	}
 
 	

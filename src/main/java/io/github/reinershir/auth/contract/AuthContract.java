@@ -33,6 +33,10 @@ public class AuthContract {
 	/**
 	 * 请求过于频繁
 	 */
-	public static final int AUTHORIZATION_STATUS_TOO_FREQUENT=5;
+	public static final int AUTHORIZATION_STATUS_TOO_MANY_REQUEST=5;
 	
+	/**
+	 * ip不匹配
+	 */
+	public static final int AUTHORIZATION_STATUS_IP_MISMATCH=6;
 }
