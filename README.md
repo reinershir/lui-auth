@@ -113,27 +113,47 @@ public class WebMvcConfig  implements WebMvcConfigurer {
 
 ## 给需要鉴权的接口添加注解标记
 
-以controller为例：
 
-```java
-@RequestMapping("test")
-@RestController
-@PermissionMapping(value = "TEST")
-public class ExampController {
+拦截器通过接口标记的权限码验证，如@PermissionMapping的value=TEST,下面的test接口中@Permission配置的是OptionType.LIST，那么权限码就是： TEST:LIST
 
-	@Permission(name = "测试redis",value = OptionType.LIST)
-	@GetMapping("testRedis")
-	public Object test(String param) {
-		return "";
-	}
-}
-```
-
-拦截器通过接口标记的权限码验证，如@PermissionMapping的value=TEST,下面的test接口@Permission配置的是OptionType.LIST，那么权限码就是： TEST:LIST
-
-权限码可自定义 : `@Permission(name = "测试接口",value = OptionType.CUSTOM,customPermissionCode = "MYCUSTOM")`
+权限码可自定义，例如: `@Permission(name = "测试接口",value = OptionType.CUSTOM,customPermissionCode = "MYCUSTOM")`，此时你需要在菜单管理的权限码填上：`TEST:MYCUSTOM`,将其配置给该用户即表示它拥有此权限
 
 当配置`value=OptionType.LOGIN` 时，表示只要拥有合法token即可访问
+
+**注意** 
+需要在菜单管理中配置你在`@Permission`注解上写的权限码，然后将该菜单的权限赋予用户它才能合法访问，超级管理员不受此限制
+
+##### 为用户绑定菜单代码如下示例
+```java
+  @Autowired
+  AuthorizeManager authorizeManager;
+
+  //...
+  @Permission(name = "添加角色",value = OptionType.ADD)
+	@PostMapping
+	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO roleDTO){
+		//保存角色时绑定菜单ID
+		authorizeManager.getRoleAccess().insert(roleDTO,roleDTO.getMenuIds()));
+		//...
+		//或者修改角色时改变菜单ID
+		authorizeManager.getRoleAccess().updateById(roleDTO, roleDTO.getMenuIds()
+	}
+```
+RoleDTO内容：
+```java
+  public class RoleDTO extends io.github.reinershir.auth.core.model.Role{
+	//前端传过来的菜单ID
+	private ArrayList<Long> menuIds;
+
+	public ArrayList<Long> getMenuIds() {
+		return menuIds;
+	}
+
+	public void setMenuIds(ArrayList<Long> menuIds) {
+		this.menuIds = menuIds;
+	} 
+}
+```
 
 ## 最后一步，生成token
 
@@ -165,6 +185,8 @@ public class LoginController {
 
 
 前端传token时需要在http header里添加：  Access-Token: 登陆接口返回的token  ,header name是可配置的，默认Access-Token
+
+
 
 
 # 获取Token中的用户ID
