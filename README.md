@@ -120,8 +120,64 @@ public class WebMvcConfig  implements WebMvcConfigurer {
 
 当配置`value=OptionType.LOGIN` 时，表示只要拥有合法token即可访问
 
-**注意** 
-需要在菜单管理中配置你在`@Permission`注解上写的权限码，然后将该菜单的权限赋予用户它才能合法访问，超级管理员不受此限制
+一个简单的示例如下：
+```java
+@RequestMapping("menus")
+@RestController
+@PermissionMapping(value="MENU")
+public class MenuController {
+	@Permission(name = "菜单列表",value = OptionType.LIST)
+	@GetMapping
+	public ResultDTO list(){
+		//...                                            
+	}
+}
+```
+上面示例中的权限码则为MENU:LIST，权限码用于填写在菜单字段里作为该接口的唯一标识
+
+#### 为普通用户配置权限 
+
+普通用户需要在菜单管理中添加你在`@Permission`注解上写的权限码，然后将该菜单的权限赋予用户它才能合法访问，超级管理员不受此限制
+
+##### 添加菜单示例
+```java
+	@Autowired
+  	AuthorizeManager authorizeManager;
+
+	@Permission(name = "添加菜单",value = OptionType.ADD)
+	@PostMapping
+	public ResultDTO<Object> addMenu(@Validated @RequestBody MenuDTO menu,@RequestParam(value="parentId",required = false) Long parentId){
+		//...
+		//parentId是父级菜单ID，可不传
+		authorizeManager.getMenuAccess().insertMenu(menu,parentId)
+		//...
+	}
+```
+MenuDTO对象内容：
+```java
+public class MenuVO implements Serializable{
+	/**
+	 * 修改数据时需要传ID
+	 */
+	private Long id;
+	
+	private String name;
+	
+	private String url;
+	
+	private String icon;
+	
+	/**
+	 * 访问该菜单所需的权限码，配置为@PermissionMapping + @Permission的值，如 USER:ADD
+	 */
+	private String permissionCodes;
+	
+	private String description;
+	
+	private String property;
+
+	//省略get set
+```
 
 ##### 为用户绑定菜单代码如下示例
 ```java
@@ -186,10 +242,16 @@ public class LoginController {
 
 前端传token时需要在http header里添加：  Access-Token: 登陆接口返回的token  ,header name是可配置的，默认Access-Token
 
+要配置Header Name:
+```yml
+lui-auth:
+  authrizationConfig: 
+    tokenHeaderName: X-Access-Token
+```
 
+# 其它说明
 
-
-# 获取Token中的用户ID
+## 获取Token中的用户ID
 
 首先注入对象
 
@@ -208,7 +270,7 @@ public Result<String> getUserId(HttpServletRequest request){
 }
 ```
 
-# Token IP绑定模式
+## Token IP绑定模式
 
 配置文件中：
 
@@ -226,7 +288,7 @@ String token = authorizeManager.generateToken(userId,userType,SecurityUtil.getIp
 ```
 
 
-# 其它说明
+## 自动生成表
 
 `intergrateConfig.enable=true` 开启时会自动生成3张表，分别为角色表、菜单表、角色权限表，3张表提供增删改查接口  
 
@@ -241,7 +303,7 @@ public Result<String> login(){
 }
 ```
 
-# 角色、菜单集成功能使用示例
+## 角色、菜单集成功能使用示例
 
 ### 角色表增删改查接口示例
 
@@ -470,7 +532,9 @@ public class WebConfig{
 
 
 
-# 表结构
+# 初始化表结构
+
+如开启了`intergrateConfig.enable=true`，会自动生成表，无需手动建表
 
 **PostgreSql**
 
