@@ -39,7 +39,7 @@ The features are as follows:
 
 #### Examp
 
-简单示例地址：https://github.com/reinershir/lui-auth-examp
+https://github.com/reinershir/lui-auth-examp
   
 # Get start
 
@@ -135,262 +135,90 @@ public class ExampController {
 	}
 }
 ```
-#### Permission Verification Rules
-拦截器通过接口标记的权限码验证，如@PermissionMapping的value=TEST,下面的test接口中@Permission配置的是OptionType.LIST，那么权限码就是： TEST:LIST
 
-权限码可自定义，例如: `@Permission(name = "测试接口",value = OptionType.CUSTOM,customPermissionCode = "MYCUSTOM")`，此时你需要在菜单管理的权限码填上：`TEST:MYCUSTOM`,将其配置给该用户即表示它拥有此权限
+## Adding annotation tags to interfaces that require authentication
 
-当配置`value=OptionType.LOGIN` 时，表示只要拥有合法token即可访问
+The interceptor verifies the permission code marked by the interface. For example, if the value of @PermissionMapping is TEST and the @Permission configured in the test interface is OptionType.LIST, then the permission code will be: TEST:LIST.
 
-*注意*
-需要在菜单管理中配置你在`@Permission`注解上写的权限码，然后将该菜单的权限赋予用户它才能合法访问，超级管理员不受此限制
+The permission code can be customized, for example: `@Permission(name = "Test Interface", value = OptionType.CUSTOM, customPermissionCode = "MYCUSTOM")`. In this case, you need to fill in `TEST:MYCUSTOM` as the permission code in menu management and assign it to users who have this permission.
 
-##### 为用户绑定菜单代码如下示例
-```java
-  @Permission(name = "添加角色",value = OptionType.ADD)
-	@ApiOperation(value = "添加角色",notes = "添加角色",httpMethod = "POST")
-	@PostMapping
-	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO dto){
-    timeout: 3000
+When configuring `value=OptionType.LOGIN`, it means that accessing only requires a valid token.
 
-
-lui-auth:
-  authrizationConfig: 
-    administratorId: 1  #Super admin user ID, to prevent the situation where roles are deleted and unable to log in, this user ID will have all permissions as soon as they log in.
-    tokenSalt: yorTokenSalt   # token salt
-    tokenExpireTime: 1800   
-  intergrateConfig: 
-    enable: true   #By using the integrated role and menu management function, three tables will be automatically generated to provide interfaces for adding, deleting, modifying, and querying.
-  securityConfig:
-    enableRequestLog: true #Enable request log printing.
-    bindIp: false #When token binding to IP is required, it can be set to true.
-```
-
-
-
-
-
-
-## Step.3 Configure Interceptors
-
-
-The following is the configuration method for Spring Boot：
-```java
-@EnableWebMvc
-public class WebMvcConfig  implements WebMvcConfigurer {
-
-
-	@Autowired(required=false)
-	AuthenticationInterceptor authenticationInterceptor;
-	
-	/**
-	 * addInterceptors
-	 */
-	@Override
-    public void addInterceptors(InterceptorRegistry registry) {
-		if(authenticationInterceptor!=null){
-			registry.addInterceptor(authenticationInterceptor);
-		}
-    }
-```
-
-
-## Step.4 Add annotation tags to the interfaces that require authentication.
-
-
-Taking the controller as an example：
-
+Here's a simple example:
 
 ```java
-@RequestMapping("test")
+@RequestMapping("menus")
 @RestController
-@PermissionMapping(value = "TEST")
-public class ExampController {
+@PermissionMapping(value="MENU")
+public class MenuController {
 
-
-	@Permission(name = "your API name,it can be null",value = OptionType.LIST)
-	@GetMapping("testRedis")
-	public Object test(String param) {
-		return "";
-	}
+@Permission(name = "Menu List", value = OptionType.LIST)
+@GetMapping
+public ResultDTO list(){
+//...
 }
-```
-#### Permission Verification Rules
-拦截器通过接口标记的权限码验证，如@PermissionMapping的value=TEST,下面的test接口中@Permission配置的是OptionType.LIST，那么权限码就是： TEST:LIST
+}
 
-
-权限码可自定义，例如: `@Permission(name = "测试接口",value = OptionType.CUSTOM,customPermissionCode = "MYCUSTOM")`，此时你需要在菜单管理的权限码填上：`TEST:MYCUSTOM`,将其配置给该用户即表示它拥有此权限
-
-
-当配置`value=OptionType.LOGIN` 时，表示只要拥有合法token即可访问
-
-
-*注意*
-需要在菜单管理中配置你在`@Permission`注解上写的权限码，然后将该菜单的权限赋予用户它才能合法访问，超级管理员不受此限制
-
-
-##### 为用户绑定菜单代码如下示例
-```java
-  @Permission(name = "添加角色",value = OptionType.ADD)
-	@ApiOperation(value = "添加角色",notes = "添加角色",httpMethod = "POST")
-	@PostMapping
-	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO dto){
-  
-		if(roleAccess.insert(dto,dto.getMenuIds())>0) {
-			return ResponseUtil.generateSuccessDTO();
-		}
-		return ResponseUtil.generateFaileDTO("添加失败！");
-	}
 ```
 
+In the above example, the permission code would be MENU:LIST. The permission code is used as a unique identifier for this interface in menu fields.
 
-## 最后一步，生成token
+#### Configuring Permissions for Regular Users
 
+**If you don't need to specify permissions for each user, you can skip this step and proceed to the final step.**
 
-在登陆接口验证完账号密码后调用以下接口生成token返回到前端：
+Regular users need to add the permission code that you have written in the `@Permission` annotation in the menu management. Then assign the permission of that menu to the user so that they can access it legally. **Super administrators are not subject to this restriction.**
 
-
+##### Example of Adding a Menu
 ```java
-
-
-@RestController
-@RequestMapping("user")
-public class LoginController {
-
-
 	@Autowired
-	AuthorizeManager authorizeManager;
-	
-	@PostMapping("login")
-	public Object login(@RequestBody LoginInfoDTO loginInfo) {
-		//登陆验证完成后
-		String userId = "你的用户ID唯一标识";
-		Sint userType = 1; //用户类型标记
-		String token = authorizeManager.generateToken(userId, userType); //如果ID={配置的administratorId}，会拥有所有权限
-		If integrated menu and role management is used, this method can be used to obtain the menu permissions bound to the user
-List<Menu> menus = authorizeManager.getMenusByUser(userId);
-return token;
-}
-}
-```    timeout: 3000
+  	AuthorizeManager authorizeManager;
 
-lui-auth:
-  authrizationConfig: 
-    administratorId: 1  #Super admin user ID, to prevent the situation where roles are deleted and unable to log in, this user ID will have all permissions as soon as they log in.
-    tokenSalt: yorTokenSalt   # token salt
-    tokenExpireTime: 1800   
-  intergrateConfig: 
-    enable: true   #By using the integrated role and menu management function, three tables will be automatically generated to provide interfaces for adding, deleting, modifying, and querying.
-  securityConfig:
-    enableRequestLog: true #Enable request log printing.
-    bindIp: false #When token binding to IP is required, it can be set to true.
+	@Permission(name = "Add Menu",value = OptionType.ADD)
+	@PostMapping
+	public ResultDTO<Object> addMenu(@Validated @RequestBody MenuDTO menu,@RequestParam(value="parentId",required = false) Long parentId){
+		//...
+		//parentId is the ID of the parent menu, it can be omitted.
+		authorizeManager.getMenuAccess().insertMenu(menu,parentId)
+		//...
+	}
 ```
-
-
-
-## Step.3 Configure Interceptors
-
-The following is the configuration method for Spring Boot：
+MenuDTO：
 ```java
-@EnableWebMvc
-public class WebMvcConfig  implements WebMvcConfigurer {
-
-	@Autowired(required=false)
-	AuthenticationInterceptor authenticationInterceptor;
-	
+public class MenuVO implements Serializable{
+	private Long id;
+	private String name;
+	private String url;
+	private String icon;
 	/**
-	 * addInterceptors
+	 * To access the required permission code for this menu, configure it as @PermissionMapping + @Permission value, such as USER:ADD.
 	 */
-	@Override
-    public void addInterceptors(InterceptorRegistry registry) {
-		if(authenticationInterceptor!=null){
-			registry.addInterceptor(authenticationInterceptor);
-		}
-    }
+	private String permissionCodes;
+	private String description;
+	private String property
+	//omission get set
 ```
 
-## Step.4 Add annotation tags to the interfaces that require authentication.
-
-Taking the controller as an example：
-
-```java
-@RequestMapping("test")
-@RestController
-@PermissionMapping(value = "TEST")
-public class ExampController {
-
-	@Permission(name = "your API name,it can be null",value = OptionType.LIST)
-	@GetMapping("testRedis")
-	public Object test(String param) {
-		return "";
-	}
-}
-```
-
-
-## 最后一步，生成token
-
-在登陆接口验证完账号密码后调用以下接口生成token返回到前端：
-
-```java
-
-@RestController
-@RequestMapping("user")
-public class LoginController {
-
-	@Autowired
-	AuthorizeManager authorizeManager;
-	
-	@PostMapping("login")
-	public Object login(@RequestBody LoginInfoDTO loginInfo) {
-		//登陆验证完成后
-		String userId = "你的用户ID唯一标识";
-		Sint userType = 1; //用户类型标记
-		String token = authorizeManager.generateToken(userId, userType); //如果ID={配置的administratorId}，会拥有所有权限
-		//如果使用了集成菜单和角色管理，可通过此方法获取该用户所绑定的菜单权限
-		List<Menu> menus = authorizeManager.getMenusByUser(userId);
-		return token;
-	}
-}
-```
-
-
-		if(roleAccess.insert(dto,dto.getMenuIds())>0) {
-			return ResponseUtil.generateSuccessDTO();
-		}
-		return ResponseUtil.generateFaileDTO("添加失败！");
-	}
-```
-
-#### Permission Verification Rules
-拦截器通过接口标记的权限码验证，如@PermissionMapping的value=TEST,下面的test接口中@Permission配置的是OptionType.LIST，那么权限码就是： TEST:LIST
-
-权限码可自定义，例如: `@Permission(name = "测试接口",value = OptionType.CUSTOM,customPermissionCode = "MYCUSTOM")`，此时你需要在菜单管理的权限码填上：`TEST:MYCUSTOM`,将其配置给该用户即表示它拥有此权限
-
-当配置`value=OptionType.LOGIN` 时，表示只要拥有合法token即可访问
-
-*注意*
-需要在菜单管理中配置你在`@Permission`注解上写的权限码，然后将该菜单的权限赋予用户它才能合法访问，超级管理员不受此限制
-
-##### 为用户绑定菜单代码如下示例
+##### To bind menu code for users, please refer to the following example.
 ```java
   @Autowired
   AuthorizeManager authorizeManager;
 
   //...
-  @Permission(name = "添加角色",value = OptionType.ADD)
+  @Permission(name = "ADD Role",value = OptionType.ADD)
 	@PostMapping
-	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO dto){
-		if(roleAccess.insert(dto,dto.getMenuIds())>0) {
-			return ResponseUtil.generateSuccessDTO();
-		}
-		return ResponseUtil.generateFaileDTO("添加失败！");
+	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO roleDTO){
+		//Save the role and bind it with menu ID.
+		authorizeManager.getRoleAccess().insert(roleDTO,roleDTO.getMenuIds()));
+		//...
+		//Or Update
+		authorizeManager.getRoleAccess().updateById(roleDTO, roleDTO.getMenuIds()
 	}
 ```
-RoleDTO内容：
+RoleDTO：
 ```java
   public class RoleDTO extends io.github.reinershir.auth.core.model.Role{
-	//前端传过来的菜单ID
+	//The menu ID passed from the front-end.
 	private ArrayList<Long> menuIds;
 
 	public ArrayList<Long> getMenuIds() {
@@ -403,28 +231,25 @@ RoleDTO内容：
 }
 ```
 
-## 最后一步，生成token
+##  The final step,Generate token
 
-在登陆接口验证完账号密码后调用以下接口生成token返回到前端：
+After verifying the account and password in the login interface, call the following interface to generate a token and return it to the front end:
 
 ```java
-
 @RestController
 @RequestMapping("user")
 public class LoginController {
-
-	@Autowired
-	AuthorizeManager authorizeManager;
-	
-	@PostMapping("login")
-	public Object login(@RequestBody LoginInfoDTO loginInfo) {
-		//登陆验证完成后
-		String userId = "你的用户ID唯一标识";
-		Sint userType = 1; //用户类型标记
-		String token = authorizeManager.generateToken(userId, userType); //如果ID={配置的administratorId}，会拥有所有权限
-		//如果使用了集成菜单和角色管理，可通过此方法获取该用户所绑定的菜单权限
-		List<Menu> menus = authorizeManager.getMenusByUser(userId);
-		return token;
+@Autowired
+AuthorizeManager authorizeManager;
+@PostMapping("login")
+public Object login(@RequestBody LoginInfoDTO loginInfo) {
+	// After completing the login verification
+	String userId = "Your unique user ID";
+	Sint userType = 1; // User type flag
+	String token = authorizeManager.generateToken(userId, userType); // If ID={configured administratorId}, all permissions will be granted.
+	// If integrated menu and role management is used, you can use this method to get the menu permissions bound to this user.
+	List<Menu> menus = authorizeManager.getMenusByUser(userId);
+	return token;
 	}
 }
 ```
@@ -432,64 +257,77 @@ public class LoginController {
 
 
 
-前端传token时需要在http header里添加：  Access-Token: 登陆接口返回的token  ,header name是可配置的，默认Access-Token
+Front-end needs to add the token in the HTTP header when transmitting. The header name can be configured, with the default value being "Access-Token".
 
+To configure the Header Name:
+```yml
+lui-auth:
+  authrizationConfig: 
+    tokenHeaderName: X-Access-Token
+```
 
-# 获取Token中的用户ID
+# Other Instructions
 
-首先注入对象
+## Get User ID from Token
+
+First inject the object:
 
 ```java
 @Autowired(required = false)
 AuthorizeManager authorizeManager;
 
 ```
-
-根据request对象获取
+Get it based on the request object:
 
 ```java
 @GetMapping
 public Result<String> getUserId(HttpServletRequest request){
-		String userId = authorizeManager.getTokenInfo(request).getUserId();
+	String userId = authorizeManager.getTokenInfo(request).getUserId();
 }
+
 ```
 
-# Token IP绑定模式
+## Token IP Binding Mode
 
-配置文件中：
+In the configuration file:
 
 ```yml
 lui-auth:
-  securityConfig:
-    bindIp: true
+securityConfig:
+bindIp: true
 ```
 
-生成token时将需要绑定的IP传入：
+When generating a token, pass in the IP that needs to be bound:
 
 ```java
-//SecurityUtil.getIpAddress(request) 可替换为你需要绑定的IP
+
+//SecurityUtil.getIpAddress(request) can be replaced with the IP you need to bind.
+
 String token = authorizeManager.generateToken(userId,userType,SecurityUtil.getIpAddress(request));
+
 ```
 
+## Automatically Generate Tables
 
-# 其它说明
+`intergrateConfig.enable=true` When enabled, three tables will be automatically generated: role table, menu table, and role permission table. These three tables provide interfaces for CRUD operations.
 
-`intergrateConfig.enable=true` 开启时会自动生成3张表，分别为角色表、菜单表、角色权限表，3张表提供增删改查接口  
+*Skip Permission Verification:*
 
-*跳过权限验证：*  
-* 1、控制器和方法上都不加注解
-* 2、控制器类上加了注解，使用注解跳过单个接口,示例： 
+* 1. Do not add annotations to both controllers and methods.
+
+* 2. Add annotations to controller classes and use annotations to skip individual interfaces. Example:
 
 ```java
 @Permission(OptionType.SKIP)
 public Result<String> login(){
-  //...
+//...
 }
+
 ```
 
-# 角色、菜单集成功能使用示例
+## Role and Menu Set Function Usage Example
 
-### 角色表增删改查接口示例
+### Role Table CRUD Interface Example
 
 ```java
 @RequestMapping("roles")
@@ -504,7 +342,7 @@ public class RoleController {
 		this.roleAccess=authorizeManager.getRoleAccess();
 	}
 
-	@Permission(name = "角色列表",value = OptionType.LIST)
+	@Permission(name = "Role List",value = OptionType.LIST)
 	@GetMapping
 	public ResultDTO<PageBean<Role>> list(@Validated PageReqDTO reqDTO){
 		List<io.github.reinershir.auth.core.model.Role> list = roleAccess.selectList(reqDTO.getPage(), reqDTO.getPageSize());
@@ -512,7 +350,7 @@ public class RoleController {
 		return ResponseUtil.generateSuccessDTO(new PageBean<>(reqDTO.getPage(),reqDTO.getPageSize(),count,list));
 	}
 	
-	@Permission(name = "添加角色",value = OptionType.ADD)
+	@Permission(name = "Add Role",value = OptionType.ADD)
 	@PostMapping
 	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO dto){
 		if(roleAccess.insert(dto,dto.getRolePermissions())>0) {
@@ -521,7 +359,7 @@ public class RoleController {
 		return ResponseUtil.generateFaileDTO("添加失败！");
 	}
 	
-	@Permission(name = "修改角色信息",value = OptionType.UPDATE)
+	@Permission(name = "Update Role",value = OptionType.UPDATE)
 	@PatchMapping
 	public ResultDTO<Object> updateUser(@Validated(value = ValidateGroups.UpdateGroup.class) @RequestBody RoleDTO roleDTO){
 		if(roleAccess.updateById(roleDTO, roleDTO.getMenuIds())>0) {
@@ -530,7 +368,7 @@ public class RoleController {
 		return ResponseUtil.generateFaileDTO("修改失败！");
 	}
 	
-	@Permission(name = "删除角色",value = OptionType.DELETE)
+	@Permission(name = "Delete Role",value = OptionType.DELETE)
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
 		if(roleAccess.deleteById(id)>0) {
@@ -539,16 +377,18 @@ public class RoleController {
 		return ResponseUtil.generateFaileDTO("修改失败！");
 	}
 	
-	@Permission(name = "查询角色所绑定的菜单权限",value = OptionType.CUSTOM,customPermissionCode = "ROLE_PERMISSION")
+	@Permission(name = "Query the menu permissions bound to the role.",value = OptionType.CUSTOM,customPermissionCode = "ROLE_PERMISSION")
 	@GetMapping("/{roleId}/rolePermissions")
 	public ResultDTO<List<RolePermission>> getRolePermissionsById(@PathVariable("roleId") Long roleId){
 		return ResponseUtil.generateSuccessDTO(roleAccess.selectRolePermissionByRole(roleId));
 	}
 }
 
+
+
 ```
 
-### 菜单表接口使用示例
+### Menu Table Interface Usage Example
 
 ```java
 @RequestMapping("menus")
@@ -563,40 +403,74 @@ public class MenuController {
 		this.MenuAccess=authorizeManager.getMenuAccess();
 	}
 
-	@Permission(name = "菜单列表",value = OptionType.LIST)
+	@Permission(name = "Menu List",value = OptionType.LIST)
 	@GetMapping
 	public ResultDTO<List<Menu>> list(@RequestParam(value="parentId",required = false) Long parentId){
 		return ResponseUtil.generateSuccessDTO(MenuAccess.qureyList(parentId));
 	}
 	
-	@Permission(name = "添加菜单",value = OptionType.ADD)
+	@Permission(name = "Add Menu",value = OptionType.ADD)
 	@PostMapping
 	public ResultDTO<Object> addMenu(@Validated @RequestBody MenuVO menu,@RequestParam(value="parentId",required = false) Long parentId){
 		if(MenuAccess.insertMenu(menu,parentId)>0) {
 			return ResponseUtil.generateSuccessDTO();
 		}
-		return ResponseUtil.generateFaileDTO("添加失败！");
+		return ResponseUtil.generateFaileDTO("faile！");
 	}
 	
-	@Permission(name = "修改菜单信息",value = OptionType.UPDATE)
+	@Permission(name = "Update Menu",value = OptionType.UPDATE)
 	@PatchMapping
 	public ResultDTO<Object> updateMenu( @RequestBody MenuVO MenuDTO){
 		if(MenuAccess.updateById(MenuDTO)>0) {
 			return ResponseUtil.generateSuccessDTO();
 		}
-		return ResponseUtil.generateFaileDTO("修改失败！");
+		return ResponseUtil.generateFaileDTO("faile！");
 	}
 	
-	@Permission(name = "删除菜单",value = OptionType.DELETE)
+	@Permission(name = "Delete Menu",value = OptionType.DELETE)
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
 		if(MenuAccess.deleteById(id)>0) {
-			return ResponseUtil.generateSuccessDTO("删除成功！");
+			return ResponseUtil.generateSuccessDTO("success！");
 		}
-		return ResponseUtil.generateFaileDTO("修改失败！");
+		return ResponseUtil.generateFaileDTO("faile！");
+	}
+
+	@Permission(name = "Moveing Menu",value = OptionType.UPDATE)
+	@PatchMapping("/position")
+	public ResultDTO<Object> updateMenu(@RequestBody @Validated  MenuMoveDTO dto){
+		boolean flag = false;
+		Long moveId = dto.getMoveId();
+		Long targetId = dto.getTargetId();
+		switch(dto.getPosition()) {
+		case 1:
+			flag = MenuAccess.moveNodeBefore(moveId, targetId)>0?true:false;
+			break;
+		case 2:
+			flag = MenuAccess.moveNodeAfter(moveId, targetId)>0?true:false;
+			break;
+		case 3:
+			flag = MenuAccess.moveNodeByParentAsLastChild(moveId, targetId)>0?true:false;
+			break;
+		}
+		if(flag) {
+			return ResponseUtil.generateSuccessDTO();
+		}
+		return ResponseUtil.generateFaileDTO("faile！");
 	}
 }
 
+public class MenuMoveDTO {
+	@NotNull
+	@ApiModelProperty(value = "ID of the menu to be moved", notes = "", required = true, example = "1")
+	private Long moveId;
+	@NotNull
+	@ApiModelProperty(value = "ID of the target menu", notes = "", required = true, example = "11")
+	private Long targetId;
+	@NotNull
+	@ApiModelProperty(value = "Position to move to in the target menu, 1=before the target, 2=after the target, 3=last child node of the target", notes ="1=before the target, 2=after the target, 3=last child node of the target", required=true ,example="1")
+	private int position;
+}
 ```
 
 ### 为用户绑定角色示例
@@ -618,7 +492,7 @@ authorizeManager.getRoleAccess().getRoleByUser(userId);
 
 *只验证Token是否有效示例：*
 ```java
-@PermissionMapping(ROLE)
+@PermissionMapping(自定义填写)
 @Permission(OptionType.LOGIN)
 public class RoleController{
 }
@@ -716,7 +590,9 @@ public class WebConfig{
 
 
 
-# 表结构
+# 初始化表结构
+
+如开启了`intergrateConfig.enable=true`，会自动生成表，无需手动建表
 
 **PostgreSql**
 
@@ -803,7 +679,6 @@ CREATE TABLE public.ROLE_MENU (
   PRIMARY KEY (ID)
 )
 ;
-
 
 ```
 
