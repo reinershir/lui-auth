@@ -137,7 +137,10 @@ public class MenuController {
 
 #### 为普通用户配置权限 
 
-普通用户需要在菜单管理中添加你在`@Permission`注解上写的权限码，然后将该菜单的权限赋予用户它才能合法访问，超级管理员不受此限制
+
+**如果你不需要为每个用户指定权限，可以跳过这一步，直接看最后一步**
+
+普通用户需要在菜单管理中添加你在`@Permission`注解上写的权限码，然后将该菜单的权限赋予用户它才能合法访问，**超级管理员不受此限制**
 
 ##### 添加菜单示例
 ```java
@@ -362,6 +365,8 @@ public class RoleController {
 	}
 }
 
+
+
 ```
 
 ### 菜单表接口使用示例
@@ -411,8 +416,45 @@ public class MenuController {
 		}
 		return ResponseUtil.generateFaileDTO("修改失败！");
 	}
+
+	@Permission(name = "移动菜单",value = OptionType.UPDATE)
+	@PatchMapping("/position")
+	public ResultDTO<Object> updateMenu(@RequestBody @Validated  MenuMoveDTO dto){
+		boolean flag = false;
+		Long moveId = dto.getMoveId();
+		Long targetId = dto.getTargetId();
+		switch(dto.getPosition()) {
+		case 1:
+			flag = MenuAccess.moveNodeBefore(moveId, targetId)>0?true:false;
+			break;
+		case 2:
+			flag = MenuAccess.moveNodeAfter(moveId, targetId)>0?true:false;
+			break;
+		case 3:
+			flag = MenuAccess.moveNodeByParentAsLastChild(moveId, targetId)>0?true:false;
+			break;
+		}
+		if(flag) {
+			return ResponseUtil.generateSuccessDTO();
+		}
+		return ResponseUtil.generateFaileDTO("修改失败！");
+	}
 }
 
+public class MenuMoveDTO {
+
+	@NotNull
+	@ApiModelProperty(value = "被移动菜单ID",notes = "",  required = true, example = "1")
+	private Long moveId;
+	
+	@NotNull
+	@ApiModelProperty(value = "目标菜单ID",notes = "",  required = true, example = "11")
+	private Long targetId;
+	
+	@NotNull
+	@ApiModelProperty(value = "移动到目标菜单的位置,1=目标前面，2=目标后面，3=目标的子节点最后一个",notes = "1=目标前面，2=目标后面，3=目标的子节点最后一个",  required = true, example = "1")
+	private int position;
+}
 ```
 
 ### 为用户绑定角色示例
@@ -434,7 +476,7 @@ authorizeManager.getRoleAccess().getRoleByUser(userId);
 
 *只验证Token是否有效示例：*
 ```java
-@PermissionMapping(ROLE)
+@PermissionMapping(自定义填写)
 @Permission(OptionType.LOGIN)
 public class RoleController{
 }
