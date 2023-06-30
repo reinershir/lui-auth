@@ -31,7 +31,7 @@ The features are as follows:
 
 * Redis 5.0 +
 
-* spring-boot-starter-data-redis 依赖
+* spring-boot-starter-data-redis 
 
 * JDK 1.8 +
   
@@ -356,7 +356,7 @@ public class RoleController {
 		if(roleAccess.insert(dto,dto.getRolePermissions())>0) {
 			return ResponseUtil.generateSuccessDTO();
 		}
-		return ResponseUtil.generateFaileDTO("添加失败！");
+		return ResponseUtil.generateFaileDTO("failed");
 	}
 	
 	@Permission(name = "Update Role",value = OptionType.UPDATE)
@@ -365,16 +365,16 @@ public class RoleController {
 		if(roleAccess.updateById(roleDTO, roleDTO.getMenuIds())>0) {
 			return ResponseUtil.generateSuccessDTO();
 		}
-		return ResponseUtil.generateFaileDTO("修改失败！");
+		return ResponseUtil.generateFaileDTO("failed");
 	}
 	
 	@Permission(name = "Delete Role",value = OptionType.DELETE)
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
 		if(roleAccess.deleteById(id)>0) {
-			return ResponseUtil.generateSuccessDTO("删除成功！");
+			return ResponseUtil.generateSuccessDTO("success");
 		}
-		return ResponseUtil.generateFaileDTO("修改失败！");
+		return ResponseUtil.generateFaileDTO("failed");
 	}
 	
 	@Permission(name = "Query the menu permissions bound to the role.",value = OptionType.CUSTOM,customPermissionCode = "ROLE_PERMISSION")
@@ -415,7 +415,7 @@ public class MenuController {
 		if(MenuAccess.insertMenu(menu,parentId)>0) {
 			return ResponseUtil.generateSuccessDTO();
 		}
-		return ResponseUtil.generateFaileDTO("faile！");
+		return ResponseUtil.generateFaileDTO("failed！");
 	}
 	
 	@Permission(name = "Update Menu",value = OptionType.UPDATE)
@@ -424,7 +424,7 @@ public class MenuController {
 		if(MenuAccess.updateById(MenuDTO)>0) {
 			return ResponseUtil.generateSuccessDTO();
 		}
-		return ResponseUtil.generateFaileDTO("faile！");
+		return ResponseUtil.generateFaileDTO("failed！");
 	}
 	
 	@Permission(name = "Delete Menu",value = OptionType.DELETE)
@@ -433,7 +433,7 @@ public class MenuController {
 		if(MenuAccess.deleteById(id)>0) {
 			return ResponseUtil.generateSuccessDTO("success！");
 		}
-		return ResponseUtil.generateFaileDTO("faile！");
+		return ResponseUtil.generateFaileDTO("failed！");
 	}
 
 	@Permission(name = "Moveing Menu",value = OptionType.UPDATE)
@@ -456,7 +456,7 @@ public class MenuController {
 		if(flag) {
 			return ResponseUtil.generateSuccessDTO();
 		}
-		return ResponseUtil.generateFaileDTO("faile！");
+		return ResponseUtil.generateFaileDTO("failed！");
 	}
 }
 
@@ -473,61 +473,61 @@ public class MenuMoveDTO {
 }
 ```
 
-### 为用户绑定角色示例
+### Binding Roles for Users Example
 
 ```java
 @Autowired
 AuthorizeManager authorizeManager;
 
 ...
-//为用户绑定角色
+//binding role
 if(!CollectionUtils.isEmpty(roleIds)) {
 	authorizeManager.getRoleAccess().bindRoleForUser(userId, roleIds);
 }
 
 
-//获取用户绑定的角色：
+//Get the roles that are bound to the user
 authorizeManager.getRoleAccess().getRoleByUser(userId);
 ```
 
-*只验证Token是否有效示例：*
+*Only validate the example of whether the token is valid:*
 ```java
-@PermissionMapping(自定义填写)
+@PermissionMapping(YOURCODE)
 @Permission(OptionType.LOGIN)
 public class RoleController{
 }
 ```
 
-### 开启IP限流功能
+### Enable IP Rate Limiting Function
 
-添加如下配置
+Add the following configuration
 ```yml
 lui-auth:
   securityConfig:
     enableRequestLimit: true
     requestTime: 3000
     requestLimit: 1
-#	requestLimitStorage: memory #IP限流缓存可选：memory、redis，建议memory内存存储，集群服务建议用redis存储
+#	requestLimitStorage: memory #IP rate limiting cache options: memory and redis are available. It is recommended to use memory for storage, while redis is suggested for cluster services.
 ```
 
-以上配置为开启全局IP限制，即每个IP 3秒内同一个接口只能请求一次
+The above configuration is for enabling global IP restriction, which means that each IP can only request the same interface once within 3 seconds.
 
-*针对单个接口/控制器的IP限流配置：* `@RequestLimit(requestLimit = 1,requestTime = 3000)` 可加在控制器类或方法上（优先使用方法上的注解）
+*For rate limiting configuration on a single interface/controller:*
 
+`@RequestLimit(requestLimit = 1,requestTime = 3000)` can be added to the controller class or method (preferably using the annotation on the method).
 
+### Automatic printing of request logs
 
-### 自动打印请求日志
-
-添加如下配置：
+Add the following configuration:
 ```yml
 lui-auth:
   securityConfig:
     enableRequestLog: true
 ```
 
-开启后会自动打印请求IP、用户ID、请求参数、请求URI等信息
+After enabling, it will automatically print information such as the requested IP, user ID, request parameters, and request URI.
 
-*自定义日志打印类(需要实现RequestLogger接口)：*
+*Custom log printing class (needs to implement the RequestLogger interface):*
 
 ```java
 @Configuration
@@ -535,7 +535,7 @@ public class WebConfig{
 
 	@Bean
 	public RequestLogger initRequestLogger(){
-		return new MyRequestLogger();  //返回自己定义的日志处理类，该类需要实现RequestLogger接口
+		return new MyRequestLogger();  //Return your own defined log processing class, which needs to implement the RequestLogger interface.
 	}
 	
 	public MyRequestLogger implements RequestLogger{
@@ -549,50 +549,47 @@ public class WebConfig{
 	}
 }
 ```
-
-当开启自动日志打印开关时拦截器会自动包装HttpServletRequest类，使其IO流可重复读取
+When the automatic log printing switch is turned on, the interceptor will automatically wrap the HttpServletRequest class to make its IO stream repeatable.
 
 # UPDATE Log
-*1.2.4* 修复BUG，新增IP绑定模式,更新获取IP方法
 
-*1.2.3* 修复bug，新增mysql8支持
+*1.2.4* Fixed bugs and added IP binding mode, updated IP acquisition method.
 
-*1.2.2* 新增PostgreSql支持
+*1.2.3* Fixed bug and added support for MySQL 8.
 
-*1.0.1* 修复了大部分BUG，目前可投入项目中正常使用，修改用户角色关系数据保存在数据中
+*1.2.2* Added support for PostgreSql.
 
-*0.1.1* 优化请求日志功能，增加token中附带用户信息
+*1.0.1* Fixed most of the bugs, currently can be used normally in projects, modified user role relationship data saved in database.
 
-*0.10* 增加IP限制功能、增加请求日志自动打印功能
+*0.1.1* Optimized request logging function, added user information attached to token.
 
-*0.0.3* 增加角色、菜单权限管理功能
+*0.10* Added IP restriction function and automatic request logging function.
 
-*0.0.1* 简单的权限验证、token验证功能
+*0.0.3 *Added role and menu permission management function.
+
+*0 . 01 * Simple authorization verification and token verification functions.
 
 # TODO LIST
 
-1、独立为一个单独的鉴权服务，支持通过注册中心、HTTP等调用方式	<br/>
+1、Independently as a separate authentication service, supporting invocation through registry center, HTTP, etc.<br/>
 
-2、IP白黑名单	<br/>
+2、IP whitelist/blacklist<br/>
 
-3、数据权限（构想中...）	<br/>
+3、Data permissions (in conception...)<br/>
 
-4、支持redisson
+4、Support Redisson
 
-5、增加支持的数据库
+5、Add supported databases
 
-6、恶意IP/域名知识库
+6、Malicious IP/domain knowledge base
 
-7、IP与TOKEN绑定
+7、Binding of IP with TOKEN
 
-8、非对称加密请求参数
+8、Asymmetric encryption of request parameters
 
+# Initialize table structure
 
-
-
-# 初始化表结构
-
-如开启了`intergrateConfig.enable=true`，会自动生成表，无需手动建表
+If `intergrateConfig.enable=true` is enabled, tables will be generated automatically without manual creation.
 
 **PostgreSql**
 
@@ -614,27 +611,27 @@ CREATE TABLE public.MENU (
 )
 ;
 
-COMMENT ON COLUMN public.MENU."URL" IS '跳转地址';
+COMMENT ON COLUMN public.MENU."URL" IS 'Redirect address';
 
-COMMENT ON COLUMN public.MENU."ICON" IS '图标';
+COMMENT ON COLUMN public.MENU."ICON" IS 'icon';
 
-COMMENT ON COLUMN public.MENU."PERMISSION_CODES" IS '权限码';
+COMMENT ON COLUMN public.MENU."PERMISSION_CODES" IS 'Permission code';
 
-COMMENT ON COLUMN public.MENU."DESCRIPTION" IS '说明 ';
+COMMENT ON COLUMN public.MENU."DESCRIPTION" IS ' ';
 
-COMMENT ON COLUMN public.MENU."LEFT_VALUE" IS '左节点值';
+COMMENT ON COLUMN public.MENU."LEFT_VALUE" IS '';
 
-COMMENT ON COLUMN public.MENU."RIGHT_VALUE" IS '右节点值';
+COMMENT ON COLUMN public.MENU."RIGHT_VALUE" IS '';
 
-COMMENT ON COLUMN public.MENU."LEVEL" IS '节点等级';
+COMMENT ON COLUMN public.MENU."LEVEL" IS '';
 
-COMMENT ON COLUMN public.MENU."PROPERTY" IS '属性(自由使用标识)';
+COMMENT ON COLUMN public.MENU."PROPERTY" IS 'Attribute (Free Use Identifier)';
 
-COMMENT ON COLUMN public.MENU."CREATE_DATE" IS '创建时间';
+COMMENT ON COLUMN public.MENU."CREATE_DATE" IS '';
 
-COMMENT ON COLUMN public.MENU."UPDATE_DATE" IS '修改时间';
+COMMENT ON COLUMN public.MENU."UPDATE_DATE" IS '';
 
-COMMENT ON TABLE public.MENU IS '菜单表';
+COMMENT ON TABLE public.MENU IS '';
 
 
 
@@ -652,17 +649,17 @@ CREATE TABLE public.ROLE (
 
 COMMENT ON COLUMN public.ROLE."ID" IS 'ID';
 
-COMMENT ON COLUMN public.ROLE."ROLE_NAME" IS '角色名称';
+COMMENT ON COLUMN public.ROLE."ROLE_NAME" IS '';
 
-COMMENT ON COLUMN public.ROLE."DESCRIPTION" IS '  说明';
+COMMENT ON COLUMN public.ROLE."DESCRIPTION" IS '  ';
 
-COMMENT ON COLUMN public.ROLE."CREATE_DATE" IS '创建时间';
+COMMENT ON COLUMN public.ROLE."CREATE_DATE" IS '';
 
-COMMENT ON COLUMN public.ROLE."UPDATE_DATE" IS '修改时间';
+COMMENT ON COLUMN public.ROLE."UPDATE_DATE" IS '';
 
-COMMENT ON TABLE public.ROLE IS '角色表';
+COMMENT ON TABLE public.ROLE IS '';
 
--- 关系表
+-- Intermediate table
 
 CREATE TABLE public.ROLE_USER (
   ID serial4,
