@@ -4,7 +4,7 @@
   <p>
   </p>
 
-[**简体中文**](README.md) |**English** | [**日本語**](README.jp.md) 
+[**简体中文**](README.zh.md) |**English** | [**日本語**](README.jp.md) 
 
 </div>
 
