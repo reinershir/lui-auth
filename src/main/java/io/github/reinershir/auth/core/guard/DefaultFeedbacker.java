@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import io.github.reinershir.auth.contract.AuthContract;
 import io.github.reinershir.auth.core.Feedbacker;
+import io.github.reinershir.auth.utils.SecurityUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -31,6 +32,10 @@ public class DefaultFeedbacker implements Feedbacker{
 				break;
 			case AuthContract.AUTHORIZATION_STATUS_NO_PERMISSION:
 				responseMsg = "{\"message\":\"no permission!\"}";
+				break;
+			case AuthContract.AUTHORIZATION_STATUS_IP_MISMATCH:
+				logger.warn("The requested IP does not match the binding IP! request uri:{} ,request ip:{}",httpServletRequest.getRequestURI(),SecurityUtil.getIpAddress(httpServletRequest));
+				responseMsg = "{\"message\":\"Illegal request!\"}";
 				break;
 			}
 			writer.write(responseMsg);

@@ -15,7 +15,6 @@
         <java.version>17</java.version>
     </properties>
      
-    
    <scm> 
       <connection>
          scm:git:https://github.com/reinershir/lui-auth.git

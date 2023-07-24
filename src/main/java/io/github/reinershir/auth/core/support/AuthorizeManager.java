@@ -151,6 +151,20 @@ public class AuthorizeManager {
 	}
 	
 	/**
+	 * @Description:   生成并保存token
+	 * @param userId 用户唯一标识
+	 * @param userType 用户类型,可为空
+	 * @param ip 用户的IP，绑定IP模式下必填
+	 * @throws Exception
+	 * @author reinershir
+	 * @date 2023年6月15日
+	 * @return String
+	 */
+	public String generateToken(@Nonnull String userId,@Nullable Integer userType,String ip) throws Exception {
+		return saveTokenToRedis(new TokenInfo(userType,userId,UUID.randomUUID().toString(),ip,null));
+	}
+	
+	/**
 	 * @Title: generateToken
 	 * @Description:   生成并保存Token到redis，可附带用户信息到Token中
 	 * @author reiner_shir
@@ -163,6 +177,22 @@ public class AuthorizeManager {
 	 */
 	public  String generateToken(@Nonnull String userId,@Nullable Integer userType,@Nullable Map<String,Object> userInfo) throws Exception {
 		return saveTokenToRedis(new TokenInfo(userType,userId,UUID.randomUUID().toString(),userInfo));
+	}
+	
+	/**
+	 * @Title: generateToken
+	 * @Description:   生成并保存Token到redis，可附带用户信息到Token中
+	 * @author xh
+	 * @date 2020年12月30日
+	 * @param userId 用户ID
+	 * @param userType 用户类型
+	 * @param ip 用户的IP，绑定IP模式下必填
+	 * @param userInfo 要保存在Token中的用户信息(注意Long类型会在Json序列化时降为Integer类型)
+	 * @return 生成的Token
+	 * @throws Exception
+	 */
+	public  String generateToken(@Nonnull String userId,@Nullable Integer userType,String ip,@Nullable Map<String,Object> userInfo) throws Exception {
+		return saveTokenToRedis(new TokenInfo(userType,userId,UUID.randomUUID().toString(),ip,userInfo));
 	}
 
 	/**
@@ -217,7 +247,7 @@ public class AuthorizeManager {
 	 */
 	public TokenInfo getTokenInfo(HttpServletRequest request) {
 		String token = request.getHeader(property.getAuthrizationConfig().getTokenHeaderName());
-		if(!StringUtils.isEmpty(token)) {
+		if(!StringUtils.isEmpty(token)&&token.indexOf("_")!=-1) {
 			String generateToken = token.split("_")[1];
 			String requiredToken = token.split("_")[0];
 			TokenInfo tokenInfo = null;
