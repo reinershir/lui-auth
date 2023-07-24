@@ -1,8 +1,5 @@
 package io.github.reinershir.auth.interceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -24,6 +21,8 @@ import io.github.reinershir.auth.core.security.reqlog.RequestLogger;
 import io.github.reinershir.auth.core.support.AuthorizeManager;
 import io.github.reinershir.auth.entity.RequestLog;
 import io.github.reinershir.auth.utils.SecurityUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 用于验证权限的拦截器

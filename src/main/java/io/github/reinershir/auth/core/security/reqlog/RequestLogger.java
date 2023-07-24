@@ -1,9 +1,8 @@
 package io.github.reinershir.auth.core.security.reqlog;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import io.github.reinershir.auth.entity.RequestLog;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface RequestLogger {
 

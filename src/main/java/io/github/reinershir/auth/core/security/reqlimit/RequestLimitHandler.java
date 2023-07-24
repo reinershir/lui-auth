@@ -2,9 +2,8 @@ package io.github.reinershir.auth.core.security.reqlimit;
 
 import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
-
 import io.github.reinershir.auth.entity.RequestCount;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class RequestLimitHandler {
 

@@ -3,14 +3,13 @@ package io.github.reinershir.auth.core.guard;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.reinershir.auth.contract.AuthContract;
 import io.github.reinershir.auth.core.Feedbacker;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class DefaultFeedbacker implements Feedbacker{
 	

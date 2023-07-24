@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * @date:   2019年8月19日 下午5:49:04   
- * @author 夏辉 
+ * @author reinershir 
  * @Description:内部服务权限控制，加上此注解表示只有指定的内部服务才能调用
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -16,7 +16,7 @@ public @interface ServicePermission {
 
 	/**
 	 * @date:   2019年8月19日 下午5:49:32   
-	 * @author 夏辉 
+	 * @author reinershir 
 	 * @Description: 指定哪些内部服务可以调用，value填serviceId,可填多个
 	 * @param: @return      
 	 * @return: String[]      

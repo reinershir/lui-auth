@@ -1,9 +1,10 @@
 package io.github.reinershir.auth.core;
 
 import javax.naming.AuthenticationException;
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.method.HandlerMethod;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 身份验证接口

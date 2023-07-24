@@ -88,8 +88,9 @@ public class DESUtil {
 
         try {
 
-            byte[] buf = cipher.doFinal(Base64Utils.decode(secretData.toCharArray()));
-
+            //byte[] buf = cipher.doFinal(Base64Utils.decode(secretData.toCharArray()));
+        	byte[] buf = cipher.doFinal(Base64Utils.decode(secretData.toCharArray()));
+        	
             return new String(buf);
 
         } catch (IllegalBlockSizeException e) {

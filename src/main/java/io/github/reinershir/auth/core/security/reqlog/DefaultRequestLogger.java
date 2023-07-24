@@ -1,13 +1,12 @@
 package io.github.reinershir.auth.core.security.reqlog;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import io.github.reinershir.auth.entity.RequestLog;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class DefaultRequestLogger implements RequestLogger{
 	
@@ -23,7 +22,7 @@ public class DefaultRequestLogger implements RequestLogger{
 		String body = log.getRequestBody();
 		String requestName = log.getRequestName();
 		logger.info("Request name:{} \t Request uri:{} \t Request User id:{} \t  Request ip:{} \n  Request body:{}",requestName,uri,userId,ip,
-				StringUtils.isEmpty(body)?request.getQueryString():body);
+				!StringUtils.hasText(body)?request.getQueryString():body);
 		threadLocal.set(log);
 	}
 

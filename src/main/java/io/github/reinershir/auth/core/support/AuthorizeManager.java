@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +34,7 @@ import io.github.reinershir.auth.core.model.RolePermission;
 import io.github.reinershir.auth.entity.TokenInfo;
 import io.github.reinershir.auth.utils.DESUtil;
 import io.github.reinershir.auth.utils.JacksonUtil;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class AuthorizeManager {
 
@@ -153,7 +153,7 @@ public class AuthorizeManager {
 	/**
 	 * @Title: generateToken
 	 * @Description:   生成并保存Token到redis，可附带用户信息到Token中
-	 * @author xh
+	 * @author reiner_shir
 	 * @date 2020年12月30日
 	 * @param userId 用户ID
 	 * @param userType 用户类型

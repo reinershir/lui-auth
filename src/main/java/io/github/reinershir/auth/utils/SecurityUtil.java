@@ -1,13 +1,12 @@
 package io.github.reinershir.auth.utils;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import io.github.reinershir.auth.core.security.reqlog.BodyCacheHttpServletRequest;
 import io.github.reinershir.auth.entity.RequestLog;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class SecurityUtil {
 	
