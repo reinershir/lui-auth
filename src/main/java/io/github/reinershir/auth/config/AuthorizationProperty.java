@@ -15,12 +15,8 @@ import io.github.reinershir.auth.core.integrate.generator.RoleGenerator;
 
 @ConfigurationProperties(prefix = "lui-auth")
 public class AuthorizationProperty implements InitializingBean{
+	@Autowired(required = false)
 	JdbcTemplate jdbcTemplate;
-	
-	
-	public AuthorizationProperty(@Autowired(required = false) JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate=jdbcTemplate;
-	}
 	
 	@NestedConfigurationProperty
 	private AuthrizationConfig authrizationConfig;

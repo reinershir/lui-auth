@@ -95,6 +95,13 @@
             	</exclusion>
             </exclusions>
   	</dependency>
+  	
+  	<!--自定义配置-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
         
         <!--  如其它依赖包中也中此依赖，应提醒排除 -->
         <dependency>
@@ -102,11 +109,6 @@
 		  <artifactId>guava</artifactId>
 		  <version>30.0-jre</version>
 		</dependency>
-		
-		<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-        </dependency>
         
   </dependencies>
   

@@ -49,7 +49,8 @@ public class AuthorizeManager {
 	public AuthorizeManager(AuthorizationProperty property,RedisTemplate<String,String> redisTemplate,PermissionScanner scanner,Appointor appointor,MenuAccess menuAccess) {
 		this.redisTemplate=redisTemplate;
 		this.property=property;
-		cache = CacheBuilder.newBuilder().expireAfterAccess(property.getAuthrizationConfig().getTokenExpireTime(), TimeUnit.SECONDS).maximumSize(500).build();
+		Long expireTime = property.getAuthrizationConfig()!=null?property.getAuthrizationConfig().getTokenExpireTime():3600l;
+		cache = CacheBuilder.newBuilder().expireAfterAccess(expireTime, TimeUnit.SECONDS).maximumSize(500).build();
 		this.scanner=scanner;
 		this.appointor=appointor;
 		this.menuAccess=menuAccess;
