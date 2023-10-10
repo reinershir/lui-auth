@@ -323,7 +323,7 @@ public class RoleAccess extends AbstractAccess<Role>{
 	/**
 	 * @Title: getRoleIdsByRoleUsers
 	 * @Description:   从角色用户关系对象中抽取角色ID并返回数组
-	 * @author xh
+	 * @author ReinerShir
 	 * @date 2021年3月2日
 	 * @param roleUsers
 	 * @return 返回角色ID列表

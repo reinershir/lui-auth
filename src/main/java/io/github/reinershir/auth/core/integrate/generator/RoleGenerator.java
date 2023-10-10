@@ -30,10 +30,10 @@ public class RoleGenerator extends GenerateTable{
 				generateSql.append(" (  `ID` bigint(0) NOT NULL AUTO_INCREMENT,"
 						+ "  `ROLE_NAME` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '角色名称',"
 						+ "  `DESCRIPTION` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,"
-						+ "  `CREATE_DATE` datetime(0) NOT NULL,"
-						+ "  `UPDATE_DATE` datetime(0) NULL DEFAULT NULL,"
+						+ "  `CREATE_DATE` datetime NOT NULL,"
+						+ "  `UPDATE_DATE` datetime NULL DEFAULT NULL,"
 						+ "  PRIMARY KEY (`ID`) USING BTREE"
-						+ ") ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
+						+ ") ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
 						+ ";");
 				
 				generateSql.append("CREATE TABLE IF NOT EXISTS ");
@@ -46,7 +46,7 @@ public class RoleGenerator extends GenerateTable{
 						+ "  PRIMARY KEY (`ID`) USING BTREE,"
 						+ "  INDEX `ROLE_ID_INDEX`(`ROLE_ID`) USING BTREE,"
 						+ "  INDEX `MENU_ID_INDEX`(`MENU_ID`) USING BTREE"
-						+ ") ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
+						+ ") ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
 						+ ";");
 				
 				generateSql.append("CREATE TABLE IF NOT EXISTS ");
@@ -55,7 +55,8 @@ public class RoleGenerator extends GenerateTable{
 				generateSql.append(" (  `ID` bigint(0) NOT NULL AUTO_INCREMENT,"
 						+ "  `ROLE_ID` bigint(0) NOT NULL,"
 						+ "  `USER_ID` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,"
-						+ ") ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
+						+ "  PRIMARY KEY (`ID`) USING BTREE"
+						+ ") ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
 						+ ";");
 			}else {
 				tableExists = true;

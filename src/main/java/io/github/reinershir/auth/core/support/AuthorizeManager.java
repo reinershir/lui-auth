@@ -183,7 +183,7 @@ public class AuthorizeManager {
 	/**
 	 * @Title: generateToken
 	 * @Description:   生成并保存Token到redis，可附带用户信息到Token中
-	 * @author xh
+	 * @author ReinerShir
 	 * @date 2020年12月30日
 	 * @param userId 用户ID
 	 * @param userType 用户类型
@@ -248,7 +248,7 @@ public class AuthorizeManager {
 	 */
 	public TokenInfo getTokenInfo(HttpServletRequest request) {
 		String token = request.getHeader(property.getAuthrizationConfig().getTokenHeaderName());
-		if(!StringUtils.isEmpty(token)&&token.indexOf("_")!=-1) {
+		if(StringUtils.hasText(token)&&token.indexOf("_")!=-1) {
 			String generateToken = token.split("_")[1];
 			String requiredToken = token.split("_")[0];
 			TokenInfo tokenInfo = null;

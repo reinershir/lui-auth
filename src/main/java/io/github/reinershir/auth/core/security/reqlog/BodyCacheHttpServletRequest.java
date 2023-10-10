@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
@@ -77,4 +78,11 @@ public class BodyCacheHttpServletRequest extends jakarta.servlet.http.HttpServle
      public String getBody() {
          return this.body;
      }
+
+	@Override
+	public Map<String, String[]> getParameterMap() {
+		return super.getRequest().getParameterMap();
+	}
+     
+     
  }

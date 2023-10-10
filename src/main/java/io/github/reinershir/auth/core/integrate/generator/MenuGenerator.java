@@ -37,7 +37,7 @@ public class MenuGenerator extends GenerateTable{
 						+ "  `CREATE_DATE` datetime(0) NOT NULL,"
 						+ "  `UPDATE_DATE` datetime(0) NULL DEFAULT NULL,"
 						+ "  PRIMARY KEY (`ID`) USING BTREE"
-						+ ") ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
+						+ ") ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic"
 						+ "");
 			}else {
 				tableExists = true;
