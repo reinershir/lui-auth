@@ -28,6 +28,11 @@ public class MenuVO implements Serializable{
 	private String description;
 	
 	private String property;
+	
+	/**
+	 * parentId 指定要添加的父节点ID，即菜单会添加为该菜单ID的子菜单
+	 */
+	private Long parentId;
 
 	public Long getId() {
 		return id;
@@ -84,6 +89,13 @@ public class MenuVO implements Serializable{
 	public void setProperty(String property) {
 		this.property = property;
 	}
-	
+
+	public Long getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(Long parentId) {
+		this.parentId = parentId;
+	}
 	
 }

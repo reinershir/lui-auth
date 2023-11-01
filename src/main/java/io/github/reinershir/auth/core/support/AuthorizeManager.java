@@ -107,7 +107,7 @@ public class AuthorizeManager {
 	 * @return 返回验证结果，参考常量：@see io.github.reinershir.auth.contract.AuthContract
 	 */
 	public int validateTokenAndRenewal(String token) {
-		if(StringUtils.isEmpty(token)) {
+		if(!StringUtils.hasText(token)) {
 			logger.error("Authentication Token Is Null!");
 			return AuthContract.AUTHORIZATION_STATUS_ILLEGAL;
 		}
@@ -219,7 +219,7 @@ public class AuthorizeManager {
 		//根据该用户绑定的角色授权
 		String administratorId = property.getAuthrizationConfig().getAdministratorId();
 		//判断是否是超级管理员
-		if(!StringUtils.isEmpty(administratorId)&&administratorId.equals(userId)) {
+		if(StringUtils.hasText(administratorId)&&administratorId.equals(userId)) {
 			appointor.grantTemporaryPermission(userId, getAllPermissionCodes(), property.getAuthrizationConfig().getTokenExpireTime());
 		}else {
 			appointor.gratPermissionByUser(userId, property.getAuthrizationConfig().getTokenExpireTime());
@@ -278,9 +278,9 @@ public class AuthorizeManager {
 	 */
 	public void logout(HttpServletRequest request) {
 		String token =  request.getHeader(property.getAuthrizationConfig().getTokenHeaderName());
-		if(!StringUtils.isEmpty(token)) {
+		if(StringUtils.hasText(token)) {
 			String userInfoToken = token.split("_")[1];
-			if(!StringUtils.isEmpty(userInfoToken)) {
+			if(StringUtils.hasText(userInfoToken)) {
 				redisTemplate.delete(userInfoToken);
 			}
 			TokenInfo tokenInfo = getTokenInfo(request);
@@ -314,7 +314,7 @@ public class AuthorizeManager {
 	 * @return 菜单列表
 	 */
 	public List<Menu> getMenusByUser(@Nonnull String userId){
-		if(!StringUtils.isEmpty(userId)&&userId.equals(property.getAuthrizationConfig().getAdministratorId())) {
+		if(StringUtils.hasText(userId)&&userId.equals(property.getAuthrizationConfig().getAdministratorId())) {
 			return menuAccess.qureyList(null);
 		}else {
 			List<RolePermission> rolePermissions = getRoleAccess().selectRolePermissionByUser(userId);
@@ -355,7 +355,7 @@ public class AuthorizeManager {
 
 	private boolean isNotEmpty(String ...param) {
 		for (String string : param) {
-			if(StringUtils.isEmpty(string)) {
+			if(!StringUtils.hasText(string)) {
 				return false;
 			}
 		}

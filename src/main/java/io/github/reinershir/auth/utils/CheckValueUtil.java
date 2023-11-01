@@ -11,23 +11,20 @@ import io.github.reinershir.auth.contract.DbContract;
 public class CheckValueUtil {
 
 	public static boolean checkPermissionCode(Permission hasPermission) {
-		return hasPermission!=null&&!StringUtils.isEmpty(hasPermission.value())?true:false;
+		return hasPermission!=null&&StringUtils.hasText(hasPermission.value().toString())?true:false;
 	}
 	
 	public static String getDbType(JdbcTemplate jdbcTemplate) throws SQLException {
 		String dbType = null;
 		String productName = null;
 		productName = jdbcTemplate.getDataSource().getConnection().getMetaData().getDatabaseProductName();
-		if(!StringUtils.isEmpty(productName)&&productName.toUpperCase().indexOf(DbContract.DB_TYPE_MYSQL)!=-1) {
+		if(StringUtils.hasText(productName)&&productName.toUpperCase().indexOf(DbContract.DB_TYPE_MYSQL)!=-1) {
 			dbType = DbContract.DB_TYPE_MYSQL;
-		}else if(!StringUtils.isEmpty(productName)&&productName.toUpperCase().indexOf(DbContract.DB_TYPE_ORACAL)!=-1) {
+		}else if(StringUtils.hasText(productName)&&productName.toUpperCase().indexOf(DbContract.DB_TYPE_ORACAL)!=-1) {
 			dbType = DbContract.DB_TYPE_ORACAL;
-		}else if(!StringUtils.isEmpty(productName)&&productName.toUpperCase().indexOf(DbContract.DB_TYPE_POSTGRE)!=-1) {
+		}else if(StringUtils.hasText(productName)&&productName.toUpperCase().indexOf(DbContract.DB_TYPE_POSTGRE)!=-1) {
 			dbType = DbContract.DB_TYPE_POSTGRE;
 		}
-//				else if(!StringUtils.isEmpty(productName)&&productName.toLowerCase().indexOf("postgre")!=-1) {
-//					this.dbType = DbContract.DB_TYPE_POSTGRE;
-//				}
 		return dbType;
 	}
 }

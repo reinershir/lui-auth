@@ -138,18 +138,17 @@ public class MenuAccess extends AbstractAccess<Menu>{
 	 * @author reinershir
 	 * @date 2020年12月1日
 	 * @param menu 要添加的菜单数据对象
-	 * @param parentId 指定要添加的父节点ID，即菜单会添加为该菜单ID的子菜单
 	 * @return 1 = true
 	 */
 	@Transactional
-	public int insertMenu(@Nonnull MenuVO menuVO,@Nullable Long parentId) {
+	public int insertMenu(@Nonnull MenuVO menuVO) {
 		int result =-1;
 		if(menuVO!=null) {
 			Menu menu = new Menu();
 			BeanUtils.copyProperties(menuVO,menu);
 			KeyHolder holder = new GeneratedKeyHolder();
 			//如果是添加初始节点
-			if(parentId==null) {
+			if(null==menuVO.getParentId()) {
 				Menu first = getFirstNode();
 				if(first==null) {
 					//如果没有一级菜单，使用默认值
@@ -166,7 +165,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 				}
 			}else {
 				//如果是添加到指定节点下面
-				Menu parent = selectById(parentId);
+				Menu parent = selectById(menuVO.getParentId());
 				//计算受影响节点
 				jdbcTemplate.update("UPDATE "+tableName+" SET LEFT_VALUE=LEFT_VALUE+2 WHERE LEFT_VALUE >= ?",parent.getRightValue());
 				jdbcTemplate.update("UPDATE "+tableName+" SET RIGHT_VALUE=RIGHT_VALUE+2 WHERE RIGHT_VALUE >= ?",parent.getRightValue());
@@ -185,7 +184,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 					ps.setString(4, menu.getPermissionCodes());
 					ps.setString(5, menu.getDescription());
 					ps.setString(6, menu.getProperty());
-					ps.setDate(7, new java.sql.Date(new Date().getTime()));
+					ps.setTimestamp(7, new java.sql.Timestamp(new Date().getTime()));
 					ps.setInt(8, menu.getLeftValue());
 					ps.setInt(9, menu.getRightValue());
 					ps.setInt(10, menu.getLevel());
@@ -241,7 +240,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 					ps.setString(4, menu.getDescription());
 					ps.setString(5, menu.getProperty());
 					ps.setString(6, menu.getPermissionCodes());
-					ps.setDate(7, new java.sql.Date(new Date().getTime()));
+					ps.setTimestamp(7, new java.sql.Timestamp(new Date().getTime()));
 					ps.setLong(8, menu.getId());
 				}
 			});
