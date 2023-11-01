@@ -506,7 +506,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 		public Menu mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Menu menu = new Menu();
 			menu.setId(rs.getLong("ID"));
-			menu.setCreateDate(rs.getDate("CREATE_DATE"));
+			menu.setCreateDate(rs.getTimestamp("CREATE_DATE"));
 			menu.setDescription(rs.getString("DESCRIPTION"));
 			menu.setName(rs.getString("NAME"));
 			menu.setUrl(rs.getString("URL"));
@@ -516,7 +516,7 @@ public class MenuAccess extends AbstractAccess<Menu>{
 			menu.setPermissionCodes(rs.getString("PERMISSION_CODES"));
 			menu.setProperty(rs.getString("PROPERTY"));
 			menu.setLevel(rs.getInt("LEVEL"));
-			menu.setUpdateDate(rs.getDate("UPDATE_DATE"));
+			menu.setUpdateDate(rs.getTimestamp("UPDATE_DATE"));
 			return menu;
 		}
 		
