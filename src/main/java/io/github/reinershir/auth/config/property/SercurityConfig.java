@@ -1,5 +1,7 @@
 package io.github.reinershir.auth.config.property;
 
+import java.util.List;
+
 import org.springframework.util.StringUtils;
 
 public class SercurityConfig {
@@ -27,6 +29,11 @@ public class SercurityConfig {
 	 * 开启日志请求记录
 	 */
 	private Boolean enableRequestLog=false;
+	
+	/**
+	 * 不需要记录日志的请求路径（可防止某些及少数无法获取到参数的情况，如支付宝回调接口）
+	 */
+	private List<String> skipLogUrls;
 	
 	/**
 	 * Token强制绑定IP
@@ -62,7 +69,7 @@ public class SercurityConfig {
 	}
 
 	public void setRequestLimitStorage(String requestLimitStorage) {
-		if(!StringUtils.isEmpty(requestLimitStorage)) {
+		if(StringUtils.hasText(requestLimitStorage)) {
 			if(requestLimitStorage.equalsIgnoreCase("memory")||requestLimitStorage.equalsIgnoreCase("redis")) {
 				this.requestLimitStorage = requestLimitStorage;
 			}else {
@@ -86,6 +93,16 @@ public class SercurityConfig {
 	public void setBindIp(Boolean bindIp) {
 		this.bindIp = bindIp;
 	}
+
+	public List<String> getSkipLogUrls() {
+		return skipLogUrls;
+	}
+
+	public void setSkipLogUrls(List<String> skipLogUrls) {
+		this.skipLogUrls = skipLogUrls;
+	}
+
+	
 
 	
 }

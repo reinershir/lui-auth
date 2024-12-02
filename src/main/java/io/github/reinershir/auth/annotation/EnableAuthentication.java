@@ -20,7 +20,6 @@ import io.github.reinershir.auth.config.AutoConfig;
 @Target(ElementType.TYPE)
 @Documented
 @Import(AutoConfig.class)
-
 public @interface EnableAuthentication {
 
 }

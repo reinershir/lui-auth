@@ -22,7 +22,7 @@ public class AuthrizationConfig {
 	/**
 	 * 用户认证数据缓存数量
 	 */
-	private Integer cacheSize = 500;
+	private Integer cacheSize = 50000;
 	
 	/**
 	 * token失效时间(单为秒)

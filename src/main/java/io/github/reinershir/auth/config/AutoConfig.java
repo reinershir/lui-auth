@@ -85,7 +85,7 @@ public class AutoConfig {
 	@ConditionalOnProperty(name = "lui-auth.securityConfig.enableRequestLog",havingValue = "true")
     public FilterRegistrationBean<RequestFilter> registerAuthFilter() {
         FilterRegistrationBean<RequestFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new RequestFilter());
+        registration.setFilter(new RequestFilter(property.getSecurityConfig()!=null?property.getSecurityConfig().getSkipLogUrls():null));
         registration.addUrlPatterns("/*");
         registration.setName("requestFilter");
         registration.setOrder(1);   

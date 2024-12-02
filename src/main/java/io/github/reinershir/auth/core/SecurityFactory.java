@@ -41,6 +41,7 @@ public class SecurityFactory {
         }else if(property.getAuthrizationConfig().getServiceCommunication()&&!StringUtils.isEmpty(serviceToken)) { 
         	return new InsideSecurity(property.getAuthrizationConfig().getServiceSecret());
         }else if(mapping!=null&&!StringUtils.isEmpty(mapping.value())) {
+        	//检查权限注解是否配置
         	if(CheckValueUtil.checkPermissionCode(methodPermission)||CheckValueUtil.checkPermissionCode(classPermission)) {
         		Boolean isBindIp = property.getSecurityConfig()!=null?property.getSecurityConfig().getBindIp():false;
         		return new UserSecurity(authorizeManager,property.getAuthrizationConfig().getTokenHeaderName(),isBindIp);

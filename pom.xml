@@ -1,188 +1,190 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>io.github.reinershir.auth</groupId>
-  <artifactId>lui-auth</artifactId>
-  <version>2.0.1</version>
-  <description>simple authentication frame work</description>
-  <name>lui-auth</name>
-  <url>https://github.com/reinershir/lui-auth</url>
-  <packaging>jar</packaging> 
-  
-  <properties>
-        <spring-boot.version>3.1.2</spring-boot.version>
-        <argLine>-Dfile.encoding=UTF-8</argLine>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>17</java.version>
-    </properties>
-     
-   <scm> 
-      <connection>
-         scm:git:https://github.com/reinershir/lui-auth.git
-      </connection>
-      <developerConnection>
-         scm:git:https://github.com/reinershir/lui-auth.git
-      </developerConnection>
-      <url>https://github.com/reinershir/lui-auth</url>
-     <tag>1.2.3</tag>
-  </scm>
-    
-    <developers>
-    <developer>
-      <name>reinershir</name>
-      <email>1929696771@qq.com</email>
-      <organization>person</organization>
-      <organizationUrl>https://github.com/reinershir</organizationUrl>
-    </developer>
-  </developers>
-  
-  <distributionManagement>
-  <repository>
-    <id>release</id>
-    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-  </repository>
-  <snapshotRepository>
-  	<!-- 这里要对应settings.xml server的ID -->
-    <id>snapshots</id>
-    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-  </snapshotRepository>
-  
-</distributionManagement>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>io.github.reinershir.auth</groupId>
+	<artifactId>lui-auth</artifactId>
+	<version>2.0.1</version>
+	<description>simple authentication frame work</description>
+	<name>lui-auth</name>
+	<url>https://github.com/reinershir/lui-auth</url>
+	<packaging>jar</packaging>
 
-    
- <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <!-- Import dependency management from Spring Boot,not include plugin
+	<properties>
+		<spring-boot.version>3.1.2</spring-boot.version>
+		<argLine>-Dfile.encoding=UTF-8</argLine>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>17</java.version>
+	</properties>
+
+	<scm>
+		<connection>
+			scm:git:https://github.com/reinershir/lui-auth.git
+		</connection>
+		<developerConnection>
+			scm:git:https://github.com/reinershir/lui-auth.git
+		</developerConnection>
+		<url>https://github.com/reinershir/lui-auth</url>
+		<tag>2.0.1</tag>
+	</scm>
+
+	<developers>
+		<developer>
+			<name>reinershir</name>
+			<email>1929696771@qq.com</email>
+			<organization>person</organization>
+			<organizationUrl>https://github.com/reinershir</organizationUrl>
+		</developer>
+	</developers>
+
+	<distributionManagement>
+		<repository>
+			<id>release</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+		<snapshotRepository>
+			<!-- 这里要对应settings.xml server的ID -->
+			<id>snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+
+	</distributionManagement>
+
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<!-- Import dependency management from Spring Boot,not include
+				plugin
                     management as the parent import style -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-  
-  <dependencies>
-  
-  <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
-  
-  	<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-            	<exclusion>
-            		<groupId>org.apache.tomcat.embed</groupId>
-            		<artifactId>tomcat-embed-websocket</artifactId>
-            	</exclusion>
-            </exclusions>
-  	</dependency>
-  	
-  	<!--自定义配置-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-        
-        <!--  如其它依赖包中也中此依赖，应提醒排除 -->
-        <dependency>
-		  <groupId>com.google.guava</groupId>
-		  <artifactId>guava</artifactId>
-		  <version>30.0-jre</version>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-        
-  </dependencies>
-  
-  <build>
-        <plugins>
-        
-         <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
-                <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                </configuration>
-            </plugin>
-        <!-- 源码打包插件 -->
-       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>2.2.1</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- java doc生成插件 -->
-	<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.0.1</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration> 
-            	<!-- 跳过javadoc的严格检查 -->
-            	<additionalOptions>-Xdoclint:none</additionalOptions>
-			</configuration>
-          </execution>
-        </executions>
-      </plugin>
-      
-      <!-- 自动签名插件 -->
-      <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-gpg-plugin</artifactId>
-      <version>1.5</version>
-      <executions>
-        <execution>
-          <id>sign-artifacts</id>
-          <phase>verify</phase>
-          <goals>
-            <goal>sign</goal> 
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-      
-        </plugins>
-  </build>
-  
-<licenses>
-    <license>
-      <name>MIT License</name>
-      <url>https://opensource.org/licenses/MIT</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  
-  
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.tomcat.embed</groupId>
+					<artifactId>tomcat-embed-websocket</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!--自定义配置-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!--  如其它依赖包中也中此依赖，应提醒排除 -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>30.0-jre</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<source>17</source>
+					<target>17</target>
+				</configuration>
+			</plugin>
+			<!-- 源码打包插件 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- java doc生成插件 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<!-- 跳过javadoc的严格检查 -->
+							<additionalOptions>-Xdoclint:none</additionalOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- 自动签名插件 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+
 </project>

@@ -73,7 +73,7 @@ public class Appointor {
 				for (Long roleId : roleIds) {
 					List<RolePermission> list = roleAccess.selectRolePermissionByRole(roleId);
 					for (RolePermission rp : list) {
-						if(rp!=null&&!StringUtils.isEmpty(rp.getPermissionCodes())) {
+						if(rp!=null&&StringUtils.hasText(rp.getPermissionCodes())) {
 							if(rp.getPermissionCodes().indexOf(",")!=-1) {
 								permissionCodes.addAll(Arrays.asList(rp.getPermissionCodes().split(",")));
 							}else {

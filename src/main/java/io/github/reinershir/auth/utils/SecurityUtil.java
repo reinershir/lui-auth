@@ -53,6 +53,7 @@ public class SecurityUtil {
 		if(request instanceof BodyCacheHttpServletRequest) {
 			body = ((BodyCacheHttpServletRequest) request).getBody();
 		}
+		
 		return new RequestLog(requestName,ip,uri,userId,body);
 	}
 	
