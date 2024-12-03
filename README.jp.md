@@ -56,6 +56,20 @@ Spring Bootのシンプルな認証ツールで、ロール、メニュー、権
 </dependency>
 
 ```
+if using spring boot 3.0 + :
+```xml
+<dependency>
+	<groupId>io.github.reinershir.auth</groupId>
+	<artifactId>lui-auth</artifactId>
+	<version>2.0.1-RELEASE</version>
+</dependency>
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+```
+
 
 ## 起動クラスにアノテーションのスイッチを追加
 

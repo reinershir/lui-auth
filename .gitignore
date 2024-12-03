@@ -4,6 +4,7 @@
 /.idea/
 /logs/
 /target/
+.vscode
 doc/:
 /doc:
 *.db

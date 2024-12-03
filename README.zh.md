@@ -50,6 +50,19 @@
 </dependency>
 
 ```
+如果使用 spring boot 3.0 + :
+```xml
+<dependency>
+	<groupId>io.github.reinershir.auth</groupId>
+	<artifactId>lui-auth</artifactId>
+	<version>2.0.1-RELEASE</version>
+</dependency>
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+```
 
 ## 启动类添加注解开关
 在你的项目启动类添加@EnableAuthentication注解开关

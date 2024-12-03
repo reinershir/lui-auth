@@ -57,6 +57,20 @@ https://github.com/reinershir/lui-auth-examp
 </dependency>
 
 ```
+if using spring boot 3.0 + :
+```xml
+<dependency>
+	<groupId>io.github.reinershir.auth</groupId>
+	<artifactId>lui-auth</artifactId>
+	<version>2.0.1-RELEASE</version>
+</dependency>
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+```
+
 
 ## Step.1 Add annotation switch to the startup class.
 
