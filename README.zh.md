@@ -4,39 +4,36 @@
   <p>
   </p>
 
-**简体中文** |[**English**](README.md) | [**日本語**](README.jp.md) 
+**简体中文** |[**English**](README.md) | [**日本語**](README.jp.md)
 
 </div>
 
 一个依赖于spring boot简单的权限验证工具，集成角色、菜单、权限功能，无需下载工程，无复杂配置，只需依赖jar并简单配置即可使用，当你不想使用任何脚手架和复杂依赖时它很有用。
 
-特点如下：<br/>
-  1、配置简单	<br/>
-  2、集成了菜单、角色、权限管理	<br/>
-  3、支持同一账号只能一人登陆	<br/>
-  4、使用注解标记权限，减少代码入侵	<br/>
-  5、使用redis存储权限信息	<br/>
+特点如下：`<br/>`
+  1、配置简单	`<br/>`
+  2、集成了菜单、角色、权限管理	`<br/>`
+  3、支持同一账号只能一人登陆	`<br/>`
+  4、使用注解标记权限，减少代码入侵	`<br/>`
+  5、使用redis存储权限信息	`<br/>`
   6、菜单管理支持无限层级树形结构，使用左右值树形结构(modified preorder tree traversal)存储，查询效率非常快
-  
+
 #### 前置环境
 
 * Spring Boot 2.0 +
-
 * Redis 5.0 +
-
 * spring-boot-starter-data-redis 依赖
-
 * JDK 1.8 +
-  
-* MYSQL 5.7+ OR ORACLE 
+* MYSQL 5.7+ OR ORACLE
 
 #### Examp
 
 简单示例地址：https://github.com/reinershir/lui-auth-examp
-  
+
 # 开始使用
 
 ## 添加依赖
+
 ```xml
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
@@ -50,12 +47,14 @@
 </dependency>
 
 ```
+
 如果使用 spring boot 3.0 + :
+
 ```xml
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>2.0.1-RELEASE</version>
+	<version>2.0.1</version>
 </dependency>
 
 <dependency>
@@ -65,12 +64,14 @@
 ```
 
 ## 启动类添加注解开关
+
 在你的项目启动类添加@EnableAuthentication注解开关
+
 ```java
 @SpringBootApplication
 @EnableAuthentication
 public class Application {
-	
+
 	public static void main(String[] args) {
 		Application.run(Application.class, args);
 	}
@@ -101,18 +102,17 @@ lui-auth:
     bindIp: false #需要token绑定IP时可设为true
 ```
 
-
-
 ## 配置拦截器
 
 以下为spring boot配置方式：
+
 ```java
 @EnableWebMvc
 public class WebMvcConfig  implements WebMvcConfigurer {
 
 	@Autowired(required=false)
 	AuthenticationInterceptor authenticationInterceptor;
-	
+
 	/**
 	 * 添加拦截器
 	 */
@@ -126,14 +126,14 @@ public class WebMvcConfig  implements WebMvcConfigurer {
 
 ## 给需要鉴权的接口添加注解标记
 
-
 拦截器通过接口标记的权限码验证，如@PermissionMapping的value=TEST,下面的test接口中@Permission配置的是OptionType.LIST，那么权限码就是： TEST:LIST
 
 权限码可自定义，例如: `@Permission(name = "测试接口",value = OptionType.CUSTOM,customPermissionCode = "MYCUSTOM")`，此时你需要在菜单管理的权限码填上：`TEST:MYCUSTOM`,将其配置给该用户即表示它拥有此权限
 
-当配置`value=OptionType.LOGIN` 时，表示只要拥有合法token即可访问
+当配置 `value=OptionType.LOGIN` 时，表示只要拥有合法token即可访问
 
 一个简单的示例如下：
+
 ```java
 @RequestMapping("menus")
 @RestController
@@ -142,20 +142,21 @@ public class MenuController {
 	@Permission(name = "菜单列表",value = OptionType.LIST)
 	@GetMapping
 	public ResultDTO list(){
-		//...                                            
+		//...                                          
 	}
 }
 ```
+
 上面示例中的权限码则为MENU:LIST，权限码用于填写在菜单字段里作为该接口的唯一标识
 
-#### 为普通用户配置权限 
-
+#### 为普通用户配置权限
 
 **如果你不需要为每个用户指定权限，可以跳过这一步，直接看最后一步**
 
-普通用户需要在菜单管理中添加你在`@Permission`注解上写的权限码，然后将该菜单的权限赋予用户它才能合法访问，**超级管理员不受此限制**
+普通用户需要在菜单管理中添加你在 `@Permission`注解上写的权限码，然后将该菜单的权限赋予用户它才能合法访问，**超级管理员不受此限制**
 
 ##### 添加菜单示例
+
 ```java
 	@Autowired
   	AuthorizeManager authorizeManager;
@@ -169,33 +170,36 @@ public class MenuController {
 		//...
 	}
 ```
+
 MenuDTO对象内容：
+
 ```java
 public class MenuVO implements Serializable{
 	/**
 	 * 修改数据时需要传ID
 	 */
 	private Long id;
-	
+
 	private String name;
-	
+
 	private String url;
-	
+
 	private String icon;
-	
+
 	/**
 	 * 访问该菜单所需的权限码，配置为@PermissionMapping + @Permission的值，如 USER:ADD
 	 */
 	private String permissionCodes;
-	
+
 	private String description;
-	
+
 	private String property;
 
 	//省略get set
 ```
 
 ##### 为用户绑定菜单代码如下示例
+
 ```java
   @Autowired
   AuthorizeManager authorizeManager;
@@ -211,7 +215,9 @@ public class MenuVO implements Serializable{
 		authorizeManager.getRoleAccess().updateById(roleDTO, roleDTO.getMenuIds()
 	}
 ```
+
 RoleDTO内容：
+
 ```java
   public class RoleDTO extends io.github.reinershir.auth.core.model.Role{
 	//前端传过来的菜单ID
@@ -239,7 +245,7 @@ public class LoginController {
 
 	@Autowired
 	AuthorizeManager authorizeManager;
-	
+
 	@PostMapping("login")
 	public Object login(@RequestBody LoginInfoDTO loginInfo) {
 		//登陆验证完成后
@@ -253,12 +259,10 @@ public class LoginController {
 }
 ```
 
-
-
-
 前端传token时需要在http header里添加：  Access-Token: 登陆接口返回的token  ,header name是可配置的，默认Access-Token
 
 要配置Header Name:
+
 ```yml
 lui-auth:
   authrizationConfig: 
@@ -303,14 +307,14 @@ lui-auth:
 String token = authorizeManager.generateToken(userId,userType,SecurityUtil.getIpAddress(request));
 ```
 
-
 ## 自动生成表
 
-`intergrateConfig.enable=true` 开启时会自动生成3张表，分别为角色表、菜单表、角色权限表，3张表提供增删改查接口  
+`intergrateConfig.enable=true` 开启时会自动生成3张表，分别为角色表、菜单表、角色权限表，3张表提供增删改查接口
 
-*跳过权限验证：*  
+*跳过权限验证：*
+
 * 1、控制器和方法上都不加注解
-* 2、控制器类上加了注解，使用注解跳过单个接口,示例： 
+* 2、控制器类上加了注解，使用注解跳过单个接口,示例：
 
 ```java
 @Permission(OptionType.SKIP)
@@ -328,8 +332,8 @@ public Result<String> login(){
 @RestController
 @PermissionMapping(value=ROLE)
 public class RoleController {
-	
-	
+
+
 	RoleAccess roleAccess;
 	@Autowired
 	public RoleController(AuthorizeManager authorizeManager) {
@@ -343,7 +347,7 @@ public class RoleController {
 		Long count = roleAccess.selectCount(null);
 		return ResponseUtil.generateSuccessDTO(new PageBean<>(reqDTO.getPage(),reqDTO.getPageSize(),count,list));
 	}
-	
+
 	@Permission(name = "添加角色",value = OptionType.ADD)
 	@PostMapping
 	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO dto){
@@ -352,7 +356,7 @@ public class RoleController {
 		}
 		return ResponseUtil.generateFaileDTO("添加失败！");
 	}
-	
+
 	@Permission(name = "修改角色信息",value = OptionType.UPDATE)
 	@PatchMapping
 	public ResultDTO<Object> updateUser(@Validated(value = ValidateGroups.UpdateGroup.class) @RequestBody RoleDTO roleDTO){
@@ -361,7 +365,7 @@ public class RoleController {
 		}
 		return ResponseUtil.generateFaileDTO("修改失败！");
 	}
-	
+
 	@Permission(name = "删除角色",value = OptionType.DELETE)
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
@@ -370,7 +374,7 @@ public class RoleController {
 		}
 		return ResponseUtil.generateFaileDTO("修改失败！");
 	}
-	
+
 	@Permission(name = "查询角色所绑定的菜单权限",value = OptionType.CUSTOM,customPermissionCode = "ROLE_PERMISSION")
 	@GetMapping("/{roleId}/rolePermissions")
 	public ResultDTO<List<RolePermission>> getRolePermissionsById(@PathVariable("roleId") Long roleId){
@@ -389,8 +393,8 @@ public class RoleController {
 @RestController
 @PermissionMapping(value=MENU)
 public class MenuController {
-	
-	
+
+
 	MenuAccess MenuAccess;
 	@Autowired
 	public MenuController(AuthorizeManager authorizeManager) {
@@ -402,7 +406,7 @@ public class MenuController {
 	public ResultDTO<List<Menu>> list(@RequestParam(value="parentId",required = false) Long parentId){
 		return ResponseUtil.generateSuccessDTO(MenuAccess.qureyList(parentId));
 	}
-	
+
 	@Permission(name = "添加菜单",value = OptionType.ADD)
 	@PostMapping
 	public ResultDTO<Object> addMenu(@Validated @RequestBody MenuVO menu,@RequestParam(value="parentId",required = false) Long parentId){
@@ -411,7 +415,7 @@ public class MenuController {
 		}
 		return ResponseUtil.generateFaileDTO("添加失败！");
 	}
-	
+
 	@Permission(name = "修改菜单信息",value = OptionType.UPDATE)
 	@PatchMapping
 	public ResultDTO<Object> updateMenu( @RequestBody MenuVO MenuDTO){
@@ -420,7 +424,7 @@ public class MenuController {
 		}
 		return ResponseUtil.generateFaileDTO("修改失败！");
 	}
-	
+
 	@Permission(name = "删除菜单",value = OptionType.DELETE)
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
@@ -459,11 +463,11 @@ public class MenuMoveDTO {
 	@NotNull
 	@ApiModelProperty(value = "被移动菜单ID",notes = "",  required = true, example = "1")
 	private Long moveId;
-	
+
 	@NotNull
 	@ApiModelProperty(value = "目标菜单ID",notes = "",  required = true, example = "11")
 	private Long targetId;
-	
+
 	@NotNull
 	@ApiModelProperty(value = "移动到目标菜单的位置,1=目标前面，2=目标后面，3=目标的子节点最后一个",notes = "1=目标前面，2=目标后面，3=目标的子节点最后一个",  required = true, example = "1")
 	private int position;
@@ -488,6 +492,7 @@ authorizeManager.getRoleAccess().getRoleByUser(userId);
 ```
 
 *只验证Token是否有效示例：*
+
 ```java
 @PermissionMapping(自定义填写)
 @Permission(OptionType.LOGIN)
@@ -498,6 +503,7 @@ public class RoleController{
 ### 开启IP限流功能
 
 添加如下配置
+
 ```yml
 lui-auth:
   securityConfig:
@@ -511,11 +517,10 @@ lui-auth:
 
 *针对单个接口/控制器的IP限流配置：* `@RequestLimit(requestLimit = 1,requestTime = 3000)` 可加在控制器类或方法上（优先使用方法上的注解）
 
-
-
 ### 自动打印请求日志
 
 添加如下配置：
+
 ```yml
 lui-auth:
   securityConfig:
@@ -534,13 +539,13 @@ public class WebConfig{
 	public RequestLogger initRequestLogger(){
 		return new MyRequestLogger();  //返回自己定义的日志处理类，该类需要实现RequestLogger接口
 	}
-	
+
 	public MyRequestLogger implements RequestLogger{
-	
+
 		@Override
 		public void processRequestLog(HttpServletRequest request, RequestLog requestLog) {
 			// ......
-			
+		
 		}
 	  
 	}
@@ -550,6 +555,7 @@ public class WebConfig{
 当开启自动日志打印开关时拦截器会自动包装HttpServletRequest类，使其IO流可重复读取
 
 # UPDATE Log
+
 *1.2.4* 修复BUG，新增IP绑定模式,更新获取IP方法
 
 *1.2.3* 修复bug，新增mysql8支持
@@ -568,11 +574,11 @@ public class WebConfig{
 
 # TODO LIST
 
-1、独立为一个单独的鉴权服务，支持通过注册中心、HTTP等调用方式	<br/>
+1、独立为一个单独的鉴权服务，支持通过注册中心、HTTP等调用方式	`<br/>`
 
-2、IP白黑名单	<br/>
+2、IP白黑名单	`<br/>`
 
-3、数据权限（构想中...）	<br/>
+3、数据权限（构想中...）	`<br/>`
 
 4、支持redisson
 
@@ -584,12 +590,9 @@ public class WebConfig{
 
 8、非对称加密请求参数
 
-
-
-
 # 初始化表结构
 
-如开启了`intergrateConfig.enable=true`，会自动生成表，无需手动建表
+如开启了 `intergrateConfig.enable=true`，会自动生成表，无需手动建表
 
 **PostgreSql**
 
@@ -679,6 +682,3 @@ CREATE TABLE public.ROLE_MENU (
 
 
 ```
-
-
-

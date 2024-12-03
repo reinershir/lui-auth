@@ -4,46 +4,37 @@
   <p>
   </p>
 
-[**简体中文**](README.zh.md) |**English** | [**日本語**](README.jp.md) 
+[**简体中文**](README.zh.md) |**English** | [**日本語**](README.jp.md)
 
 </div>
 
 A simple permission verification tool that relies on Spring Boot, integrating role, menu, and permission functionalities. No need to download the project or configure complex settings. Just rely on the JAR file and make simple configurations to use it. It is very useful when you don't want to use any scaffolding or complex dependencies.
 
-
 The features are as follows:
 
 1. Simple configuration.
-
 2. Integration of menu, role, and permission management.
-
 3. Support for only one person logging in with the same account.
-
 4. Use annotations to mark permissions and reduce code intrusion.
-
 5. Use Redis to store permission information.
-
 6. Menu management supports an unlimited hierarchical tree structure stored using modified preorder tree traversal, resulting in highly efficient queries.
-  
+
 #### Preconditions
 
 * Spring Boot 2.0 +
-
 * Redis 5.0 +
-
-* spring-boot-starter-data-redis 
-
+* spring-boot-starter-data-redis
 * JDK 1.8 +
-  
-* MYSQL 5.7+ OR ORACLE 
+* MYSQL 5.7+ OR ORACLE
 
 #### Examp
 
 https://github.com/reinershir/lui-auth-examp
-  
+
 # Get start
 
 ## Dependency
+
 ```xml
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
@@ -57,12 +48,14 @@ https://github.com/reinershir/lui-auth-examp
 </dependency>
 
 ```
+
 if using spring boot 3.0 + :
+
 ```xml
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>2.0.1-RELEASE</version>
+	<version>2.0.1</version>
 </dependency>
 
 <dependency>
@@ -71,15 +64,15 @@ if using spring boot 3.0 + :
 </dependency>
 ```
 
-
 ## Step.1 Add annotation switch to the startup class.
 
 Add the @EnableAuthentication annotation switch to your project's startup class.
+
 ```java
 @SpringBootApplication
 @EnableAuthentication
 public class Application {
-	
+
 	public static void main(String[] args) {
 		Application.run(Application.class, args);
 	}
@@ -109,18 +102,17 @@ lui-auth:
     bindIp: false #When token binding to IP is required, it can be set to true.
 ```
 
-
-
 ## Step.3 Configure Interceptors
 
 The following is the configuration method for Spring Boot：
+
 ```java
 @EnableWebMvc
 public class WebMvcConfig  implements WebMvcConfigurer {
 
 	@Autowired(required=false)
 	AuthenticationInterceptor authenticationInterceptor;
-	
+
 	/**
 	 * addInterceptors
 	 */
@@ -184,6 +176,7 @@ In the above example, the permission code would be MENU:LIST. The permission cod
 Regular users need to add the permission code that you have written in the `@Permission` annotation in the menu management. Then assign the permission of that menu to the user so that they can access it legally. **Super administrators are not subject to this restriction.**
 
 ##### Example of Adding a Menu
+
 ```java
 	@Autowired
   	AuthorizeManager authorizeManager;
@@ -197,7 +190,9 @@ Regular users need to add the permission code that you have written in the `@Per
 		//...
 	}
 ```
+
 MenuDTO：
+
 ```java
 public class MenuVO implements Serializable{
 	private Long id;
@@ -214,6 +209,7 @@ public class MenuVO implements Serializable{
 ```
 
 ##### To bind menu code for users, please refer to the following example.
+
 ```java
   @Autowired
   AuthorizeManager authorizeManager;
@@ -229,7 +225,9 @@ public class MenuVO implements Serializable{
 		authorizeManager.getRoleAccess().updateById(roleDTO, roleDTO.getMenuIds()
 	}
 ```
+
 RoleDTO：
+
 ```java
   public class RoleDTO extends io.github.reinershir.auth.core.model.Role{
 	//The menu ID passed from the front-end.
@@ -245,7 +243,7 @@ RoleDTO：
 }
 ```
 
-##  The final step,Generate token
+## The final step,Generate token
 
 After verifying the account and password in the login interface, call the following interface to generate a token and return it to the front end:
 
@@ -268,12 +266,10 @@ public Object login(@RequestBody LoginInfoDTO loginInfo) {
 }
 ```
 
-
-
-
 Front-end needs to add the token in the HTTP header when transmitting. The header name can be configured, with the default value being "Access-Token".
 
 To configure the Header Name:
+
 ```yml
 lui-auth:
   authrizationConfig: 
@@ -291,6 +287,7 @@ First inject the object:
 AuthorizeManager authorizeManager;
 
 ```
+
 Get it based on the request object:
 
 ```java
@@ -328,7 +325,6 @@ String token = authorizeManager.generateToken(userId,userType,SecurityUtil.getIp
 *Skip Permission Verification:*
 
 * 1. Do not add annotations to both controllers and methods.
-
 * 2. Add annotations to controller classes and use annotations to skip individual interfaces. Example:
 
 ```java
@@ -348,8 +344,8 @@ public Result<String> login(){
 @RestController
 @PermissionMapping(value=ROLE)
 public class RoleController {
-	
-	
+
+
 	RoleAccess roleAccess;
 	@Autowired
 	public RoleController(AuthorizeManager authorizeManager) {
@@ -363,7 +359,7 @@ public class RoleController {
 		Long count = roleAccess.selectCount(null);
 		return ResponseUtil.generateSuccessDTO(new PageBean<>(reqDTO.getPage(),reqDTO.getPageSize(),count,list));
 	}
-	
+
 	@Permission(name = "Add Role",value = OptionType.ADD)
 	@PostMapping
 	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO dto){
@@ -372,7 +368,7 @@ public class RoleController {
 		}
 		return ResponseUtil.generateFaileDTO("failed");
 	}
-	
+
 	@Permission(name = "Update Role",value = OptionType.UPDATE)
 	@PatchMapping
 	public ResultDTO<Object> updateUser(@Validated(value = ValidateGroups.UpdateGroup.class) @RequestBody RoleDTO roleDTO){
@@ -381,7 +377,7 @@ public class RoleController {
 		}
 		return ResponseUtil.generateFaileDTO("failed");
 	}
-	
+
 	@Permission(name = "Delete Role",value = OptionType.DELETE)
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
@@ -390,7 +386,7 @@ public class RoleController {
 		}
 		return ResponseUtil.generateFaileDTO("failed");
 	}
-	
+
 	@Permission(name = "Query the menu permissions bound to the role.",value = OptionType.CUSTOM,customPermissionCode = "ROLE_PERMISSION")
 	@GetMapping("/{roleId}/rolePermissions")
 	public ResultDTO<List<RolePermission>> getRolePermissionsById(@PathVariable("roleId") Long roleId){
@@ -409,8 +405,8 @@ public class RoleController {
 @RestController
 @PermissionMapping(value=MENU)
 public class MenuController {
-	
-	
+
+
 	MenuAccess MenuAccess;
 	@Autowired
 	public MenuController(AuthorizeManager authorizeManager) {
@@ -422,7 +418,7 @@ public class MenuController {
 	public ResultDTO<List<Menu>> list(@RequestParam(value="parentId",required = false) Long parentId){
 		return ResponseUtil.generateSuccessDTO(MenuAccess.qureyList(parentId));
 	}
-	
+
 	@Permission(name = "Add Menu",value = OptionType.ADD)
 	@PostMapping
 	public ResultDTO<Object> addMenu(@Validated @RequestBody MenuVO menu,@RequestParam(value="parentId",required = false) Long parentId){
@@ -431,7 +427,7 @@ public class MenuController {
 		}
 		return ResponseUtil.generateFaileDTO("failed！");
 	}
-	
+
 	@Permission(name = "Update Menu",value = OptionType.UPDATE)
 	@PatchMapping
 	public ResultDTO<Object> updateMenu( @RequestBody MenuVO MenuDTO){
@@ -440,7 +436,7 @@ public class MenuController {
 		}
 		return ResponseUtil.generateFaileDTO("failed！");
 	}
-	
+
 	@Permission(name = "Delete Menu",value = OptionType.DELETE)
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
@@ -505,6 +501,7 @@ authorizeManager.getRoleAccess().getRoleByUser(userId);
 ```
 
 *Only validate the example of whether the token is valid:*
+
 ```java
 @PermissionMapping(YOURCODE)
 @Permission(OptionType.LOGIN)
@@ -515,6 +512,7 @@ public class RoleController{
 ### Enable IP Rate Limiting Function
 
 Add the following configuration
+
 ```yml
 lui-auth:
   securityConfig:
@@ -533,6 +531,7 @@ The above configuration is for enabling global IP restriction, which means that 
 ### Automatic printing of request logs
 
 Add the following configuration:
+
 ```yml
 lui-auth:
   securityConfig:
@@ -551,18 +550,19 @@ public class WebConfig{
 	public RequestLogger initRequestLogger(){
 		return new MyRequestLogger();  //Return your own defined log processing class, which needs to implement the RequestLogger interface.
 	}
-	
+
 	public MyRequestLogger implements RequestLogger{
-	
+
 		@Override
 		public void processRequestLog(HttpServletRequest request, RequestLog requestLog) {
 			// ......
-			
+		
 		}
 	  
 	}
 }
 ```
+
 When the automatic log printing switch is turned on, the interceptor will automatically wrap the HttpServletRequest class to make its IO stream repeatable.
 
 # UPDATE Log
@@ -585,11 +585,11 @@ When the automatic log printing switch is turned on, the interceptor will automa
 
 # TODO LIST
 
-1、Independently as a separate authentication service, supporting invocation through registry center, HTTP, etc.<br/>
+1、Independently as a separate authentication service, supporting invocation through registry center, HTTP, etc.`<br/>`
 
-2、IP whitelist/blacklist<br/>
+2、IP whitelist/blacklist`<br/>`
 
-3、Data permissions (in conception...)<br/>
+3、Data permissions (in conception...)`<br/>`
 
 4、Support Redisson
 
@@ -692,6 +692,3 @@ CREATE TABLE public.ROLE_MENU (
 ;
 
 ```
-
-
-

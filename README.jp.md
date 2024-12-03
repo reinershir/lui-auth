@@ -10,30 +10,21 @@
 
 Spring Bootのシンプルな認証ツールで、ロール、メニュー、権限の機能を統合しています。プロジェクトのダウンロードや複雑な設定は必要ありません。単にjarファイルに依存し、簡単な設定を行うだけで使用することができます。フレームワークや複雑な依存関係を使いたくない場合に非常に便利です。
 
-以下は特徴です：<br/>
+以下は特徴です：`<br/>`
 
-1. シンプルな設定<br/>
-
-2. メニュー、ロール、権限管理の統合<br/>
-
-3. 同じアカウントで一人しかログインできない制約サポート<br/>
-
-4. アノテーションを使用した権限マーキングによるコードへの影響低減<br/>
-
-5. 権限情報の保存にRedisを使用<br/>
-
+1. シンプルな設定`<br/>`
+2. メニュー、ロール、権限管理の統合`<br/>`
+3. 同じアカウントで一人しかログインできない制約サポート`<br/>`
+4. アノテーションを使用した権限マーキングによるコードへの影響低減`<br/>`
+5. 権限情報の保存にRedisを使用`<br/>`
 6. 無制限階層ツリー形式のメニュー管理（左右値木構造）で効率的なクエリ処理
 
 #### 前提条件
 
 * Spring Bootバージョン2.0以上
-
 * Redisバージョン5.0以上
-
 * spring-boot-starter-data-redis依存関係
-
 * JDKバージョン1.8以上
-
 * MYSQLバージョン5.7以上またはORACLE
 
 #### サンプル
@@ -43,6 +34,7 @@ Spring Bootのシンプルな認証ツールで、ロール、メニュー、権
 # 使用開始
 
 ## 依存関係を追加
+
 ```xml
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
@@ -56,12 +48,14 @@ Spring Bootのシンプルな認証ツールで、ロール、メニュー、権
 </dependency>
 
 ```
+
 if using spring boot 3.0 + :
+
 ```xml
 <dependency>
 	<groupId>io.github.reinershir.auth</groupId>
 	<artifactId>lui-auth</artifactId>
-	<version>2.0.1-RELEASE</version>
+	<version>2.0.1</version>
 </dependency>
 
 <dependency>
@@ -70,15 +64,15 @@ if using spring boot 3.0 + :
 </dependency>
 ```
 
-
 ## 起動クラスにアノテーションのスイッチを追加
 
 プロジェクトの起動クラスに@EnableAuthenticationアノテーションのスイッチを追加してください。
+
 ```java
 @SpringBootApplication
 @EnableAuthentication
 public class Application {
-	
+
 	public static void main(String[] args) {
 		Application.run(Application.class, args);
 	}
@@ -111,13 +105,14 @@ lui-auth:
 ## インターセプタの設定方法
 
 以下はSpring Bootでの設定方法です：
+
 ```java
 @EnableWebMvc
 public class WebMvcConfig  implements WebMvcConfigurer {
 
 	@Autowired(required=false)
 	AuthenticationInterceptor authenticationInterceptor;
-	
+
 	@Override
     public void addInterceptors(InterceptorRegistry registry) {
 		if(authenticationInterceptor!=null){
@@ -135,6 +130,7 @@ public class WebMvcConfig  implements WebMvcConfigurer {
 「value=OptionType.LOGIN」と設定されている場合は、有効なトークンさえ持っていればアクセス可能です。
 
 以下は簡単な例です：
+
 ```java
 @RequestMapping("menus")
 @RestController
@@ -143,10 +139,11 @@ public class MenuController {
 	@Permission(name = "菜单列表",value = OptionType.LIST)
 	@GetMapping
 	public ResultDTO list(){
-		//...                                            
+		//...                                          
 	}
 }
 ```
+
 上記の例では、権限コードはMENU:LISTであり、このインターフェースを一意に識別するためにメニューフィールドに入力されます。
 
 #### 一般ユーザーの権限設定
@@ -156,6 +153,7 @@ public class MenuController {
 一般ユーザーは、`@Permission`アノテーションで指定した権限コードをメニュー管理に追加し、そのメニューの権限を付与されることで正当なアクセスが可能となります。ただし、「超級管理者」はこの制約の影響を受けません。
 
 ##### メニュー追加例
+
 ```java
 	@Autowired
   	AuthorizeManager authorizeManager;
@@ -169,31 +167,34 @@ public class MenuController {
 		//...
 	}
 ```
+
 MenuDTO对象内容：
+
 ```java
 public class MenuVO implements Serializable{
 
 	private Long id;
-	
+
 	private String name;
-	
+
 	private String url;
-	
+
 	private String icon;
-	
+
 	/**
 	 * メニューにアクセスするための権限コードは、@PermissionMapping + @Permissionの値で設定されます。例えば、USER:ADDです。
 	 */
 	private String permissionCodes;
-	
+
 	private String description;
-	
+
 	private String property;
 
 	//省略get set
 ```
 
 ##### ユーザーにメニューコードをバインドする例は以下の通りです。
+
 ```java
   @Autowired
   AuthorizeManager authorizeManager;
@@ -209,7 +210,9 @@ public class MenuVO implements Serializable{
 		authorizeManager.getRoleAccess().updateById(roleDTO, roleDTO.getMenuIds()
 	}
 ```
+
 RoleDTO内容：
+
 ```java
   public class RoleDTO extends io.github.reinershir.auth.core.model.Role{
 	//前端传过来的菜单ID
@@ -253,6 +256,7 @@ public Object login(@RequestBody LoginInfoDTO loginInfo) {
 フロントエンドからトークンを送信する際は、httpヘッダに次のように追加する必要があります：Access-Token: ログインインターフェースから返されたトークン。デフォルトではHeader Nameは"Access-Token"です。
 
 Header Name を設定する必要があります。
+
 ```yml
 lui-auth:
   authrizationConfig: 
@@ -298,7 +302,6 @@ lui-auth:
 String token = authorizeManager.generateToken(userId,userType,SecurityUtil.getIpAddress(request));
 ```
 
-
 ## 自動生成テーブル
 
 `intergrateConfig.enable=true` を有効にすると、3つのテーブルが自動的に生成されます。それぞれ役割テーブル、メニューテーブル、役割権限テーブルであり、これらのテーブルは追加、削除、更新、検索のインタフェースを提供します。
@@ -306,7 +309,6 @@ String token = authorizeManager.generateToken(userId,userType,SecurityUtil.getIp
 *権限チェックをスキップする方法：*
 
 * 1. コントローラーおよびメソッドに注釈を付けない
-
 * 2. コントローラークラスに注釈を付けて個別のインタフェースをスキップする,例：
 
 ```java
@@ -325,8 +327,8 @@ public Result<String> login(){
 @RestController
 @PermissionMapping(value=ROLE)
 public class RoleController {
-	
-	
+
+
 	RoleAccess roleAccess;
 	@Autowired
 	public RoleController(AuthorizeManager authorizeManager) {
@@ -340,7 +342,7 @@ public class RoleController {
 		Long count = roleAccess.selectCount(null);
 		return ResponseUtil.generateSuccessDTO(new PageBean<>(reqDTO.getPage(),reqDTO.getPageSize(),count,list));
 	}
-	
+
 	@Permission(name = "添加角色",value = OptionType.ADD)
 	@PostMapping
 	public ResultDTO<Object> addRole(@Validated @RequestBody RoleDTO dto){
@@ -349,7 +351,7 @@ public class RoleController {
 		}
 		return ResponseUtil.generateFaileDTO("添加失败！");
 	}
-	
+
 	@Permission(name = "修改角色信息",value = OptionType.UPDATE)
 	@PatchMapping
 	public ResultDTO<Object> updateUser(@Validated(value = ValidateGroups.UpdateGroup.class) @RequestBody RoleDTO roleDTO){
@@ -358,7 +360,7 @@ public class RoleController {
 		}
 		return ResponseUtil.generateFaileDTO("修改失败！");
 	}
-	
+
 	@Permission(name = "删除角色",value = OptionType.DELETE)
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
@@ -367,7 +369,7 @@ public class RoleController {
 		}
 		return ResponseUtil.generateFaileDTO("修改失败！");
 	}
-	
+
 	@Permission(name = "查询角色所绑定的菜单权限",value = OptionType.CUSTOM,customPermissionCode = "ROLE_PERMISSION")
 	@GetMapping("/{roleId}/rolePermissions")
 	public ResultDTO<List<RolePermission>> getRolePermissionsById(@PathVariable("roleId") Long roleId){
@@ -386,8 +388,8 @@ public class RoleController {
 @RestController
 @PermissionMapping(value=MENU)
 public class MenuController {
-	
-	
+
+
 	MenuAccess MenuAccess;
 	@Autowired
 	public MenuController(AuthorizeManager authorizeManager) {
@@ -399,7 +401,7 @@ public class MenuController {
 	public ResultDTO<List<Menu>> list(@RequestParam(value="parentId",required = false) Long parentId){
 		return ResponseUtil.generateSuccessDTO(MenuAccess.qureyList(parentId));
 	}
-	
+
 	@Permission(name = "添加菜单",value = OptionType.ADD)
 	@PostMapping
 	public ResultDTO<Object> addMenu(@Validated @RequestBody MenuVO menu,@RequestParam(value="parentId",required = false) Long parentId){
@@ -408,7 +410,7 @@ public class MenuController {
 		}
 		return ResponseUtil.generateFaileDTO("添加失败！");
 	}
-	
+
 	@Permission(name = "修改菜单信息",value = OptionType.UPDATE)
 	@PatchMapping
 	public ResultDTO<Object> updateMenu( @RequestBody MenuVO MenuDTO){
@@ -417,7 +419,7 @@ public class MenuController {
 		}
 		return ResponseUtil.generateFaileDTO("修改失败！");
 	}
-	
+
 	@Permission(name = "删除菜单",value = OptionType.DELETE)
 	@DeleteMapping("/{id}")
 	public ResultDTO<Object> delete(@PathVariable("id") Long id){
@@ -482,6 +484,7 @@ authorizeManager.getRoleAccess().getRoleByUser(userId);
 ```
 
 *トークンの有効性を確認するだけの例：*
+
 ```java
 @PermissionMapping(自定义填写)
 @Permission(OptionType.LOGIN)
@@ -492,6 +495,7 @@ public class RoleController{
 ### IP制限機能を有効にする
 
 以下の設定を追加してください。
+
 ```yml
 lui-auth:
   securityConfig:
@@ -508,11 +512,13 @@ lui-auth:
 ### リクエストログを自動的に出力する
 
 以下の設定を追加してください：
+
 ```yml
 lui-auth:
   securityConfig:
     enableRequestLog: true
 ```
+
 開始すると、IPアドレス、ユーザーID、リクエストパラメータ、リクエストURIなどの情報が自動的に印刷されます。
 
 *カスタムログ出力クラス（RequestLoggerインターフェースを実装する必要があります）：*
@@ -525,13 +531,13 @@ public class WebConfig{
 	public RequestLogger initRequestLogger(){
 		return new MyRequestLogger();  //返回自己定义的日志处理类，该类需要实现RequestLogger接口
 	}
-	
+
 	public MyRequestLogger implements RequestLogger{
-	
+
 		@Override
 		public void processRequestLog(HttpServletRequest request, RequestLog requestLog) {
 			// ......
-			
+		
 		}
 	  
 	}
@@ -560,11 +566,11 @@ public class WebConfig{
 
 ＃TODOリスト
 
-1つ目：独立した認証サービスとして独立し、レジストリセンター、HTTPなどの呼び出し方法をサポートします。<br/>
+1つ目：独立した認証サービスとして独立し、レジストリセンター、HTTPなどの呼び出し方法をサポートします。`<br/>`
 
-2つ目：IPホワイトリスト/ブラックリスト<br/>
+2つ目：IPホワイトリスト/ブラックリスト`<br/>`
 
-3番目：データアクセス権限（コンセプト中...）<br/>
+3番目：データアクセス権限（コンセプト中...）`<br/>`
 
 4番目：redissonのサポートを追加する
 
@@ -664,5 +670,3 @@ CREATE TABLE public.ROLE_MENU (
 
 
 ```
-
-
